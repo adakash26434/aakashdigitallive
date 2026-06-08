@@ -1,0 +1,363 @@
+/* ======================================================
+   admin-forms.css — Uniform Admin Form Layout System
+   Loaded only in admin/portal context (see head.php)
+   NOTE: theme.css loads first; this file extends/overrides
+   for the dashboard context only.
+   ====================================================== */
+
+/* ── Split-panel layout ────────────────────────────────
+   Left: list/table  |  Right: 22rem sticky form panel
+   Canonical source — admin-layout.php no longer duplicates.
+   ─────────────────────────────────────────────────────*/
+.af-split {
+  display: grid;
+  grid-template-columns: 1fr 22rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── Sticky form panel wrapper ─────────────────────── */
+.af-panel {
+  position: sticky;
+  top: 5.5rem;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
+}
+
+/* ── Settings: remove legacy max-width restriction ─── */
+.st-card.p-card-lg {
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Uniform form-label size inside admin panels ────── */
+.af-split .form-label,
+.af-panel .form-label,
+.p-tile .form-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.3rem;
+  display: block;
+  color: var(--muted-foreground);
+}
+
+/* ── Admin/portal form controls — extend theme.css base
+   Uses --input background token, 16px font (no iOS zoom),
+   lighter padding. !important wins over theme.css defaults.
+   ─────────────────────────────────────────────────────*/
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100% !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: var(--radius-md, 0.5rem) !important;
+  border: 1px solid var(--border) !important;
+  font-size: 1rem !important;          /* 16px — prevents iOS auto-zoom */
+  background: var(--input, var(--card)) !important;
+  color: var(--foreground) !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ── Grid helpers for form rows ─────────────────────── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ── Inline form group ───────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-group-inline {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+/* ── Form footer buttons bar ─────────────────────────── */
+.af-form-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.af-form-footer-buttons {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.af-form-footer-buttons .btn {
+  flex: 1;
+}
+
+/* ── Empty state dashed placeholder ─────────────────── */
+.af-empty {
+  border: 2px dashed var(--border);
+  border-radius: 1rem;
+  padding: 3rem;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+/* ── Page-level navigation tabs (e.g. Jobs / Apps) ──── */
+.af-page-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.af-page-tabs::-webkit-scrollbar { display: none; }
+
+.af-page-tab {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--muted-foreground);
+  transition: color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.af-page-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.af-page-tab .af-badge {
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  background: var(--danger-soft);
+  color: var(--danger-fg);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+/* ── In-panel form tabs ──────────────────────────────── */
+.af-tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.af-tab-nav::-webkit-scrollbar { display: none; }
+
+.af-tab-btn {
+  flex: 1;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  transition: color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  min-width: 60px;
+  font-family: inherit;
+}
+.af-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* af-tab-pane: hidden by default, shown with .active
+   Both CSS-class tabs and Alpine x-show tabs rely on
+   display:flex so column gap works. */
+.af-tab-pane {
+  display: none !important;
+}
+.af-tab-pane.active {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* ── Checkbox & Radio ────────────────────────────────── */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+/* ── Status indicators (not in theme.css) ────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.status-active   { background: rgba(34, 197, 94, 0.12); color: var(--success-fg); }
+.status-inactive { background: var(--muted); color: var(--muted-foreground); }
+.status-warning  { background: var(--warning-soft); color: var(--warning-fg); }
+.status-danger   { background: var(--danger-soft);  color: var(--danger-fg); }
+
+/* ── Admin table (not in theme.css) ─────────────────── */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.admin-table thead {
+  background: var(--muted);
+  border-bottom: 2px solid var(--border);
+}
+.admin-table th {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.admin-table tbody tr {
+  transition: background 0.12s;
+}
+.admin-table tbody tr:hover {
+  background: var(--muted);
+}
+.admin-table .cell-actions {
+  display: flex;
+  gap: 0.375rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* ── Scrollable form container ───────────────────────── */
+.af-form-scroll {
+  overflow-y: auto;
+  max-height: calc(100vh - 280px);
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
+}
+
+/* ── Tab layout: full-width form ─────────────────────── */
+#aft-form .st-card.p-tile {
+  max-width: 720px;
+  width: 100%;
+}
+#aft-form .st-card.p-card-lg {
+  max-width: none;
+}
+
+/* ── Form section dividers ───────────────────────────── */
+.form-section {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.form-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.form-section-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .af-split {
+    grid-template-columns: 1fr !important;
+  }
+  .af-panel {
+    position: static !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .af-page-tab {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+  }
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 1rem !important; /* keep 16px — iOS no-zoom */
+  }
+}
+
+@media (max-width: 480px) {
+  .af-form-footer-buttons {
+    flex-direction: column;
+  }
+  .af-form-footer-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
