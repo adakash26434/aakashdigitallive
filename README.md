@@ -1,8 +1,7 @@
-# Ankur Infotech Butwal — Corporate Website & Admin Panel
+# Corporate Website & Admin Panel
 
 **A modern, production-ready PHP application** for cooperatives and tech companies. Features complete content management, client portal, and dynamic configuration.
 
-- **Live:** https://ankurinfotech.com.np
 - **Tech Stack:** PHP 7.4+, MySQL/MariaDB, Bootstrap 5, Tailwind CSS, Alpine.js
 - **Deployment:** cPanel/Shared Hosting
 - **License:** Private
@@ -13,10 +12,9 @@
 
 | Item | Details |
 |------|---------|
-| **Project** | Ankur Infotech Pvt. Ltd. Corporate Site |
-| **Location** | Butwal, Rupandehi, Nepal |
+| **Project** | Corporate Website & Admin Panel |
 | **Database** | MySQL (cPanel) / SQLite (dev) |
-| **Admin** | https://ankurinfotech.com.np/admin/ |
+| **Admin** | `{SITE_URL}/admin/` |
 | **Setup Time** | 5 minutes on cPanel |
 
 ---
@@ -25,41 +23,32 @@
 
 ### For cPanel Deployment
 
-See **[CPANEL_SETUP.md](./CPANEL_SETUP.md)** for:
-- Database setup in cPanel
-- Git clone & pull workflow
-- File permissions
-- Storage management
-- Troubleshooting
-
 **Quick Steps:**
 ```bash
 1. Create MySQL database in cPanel
-2. Clone: git clone https://github.com/adakash26434/butwal.git
+2. Clone: git clone {YOUR_REPO_URL}
 3. Import: database.sql via phpMyAdmin
 4. Configure: includes/config.php with DB credentials
 5. chmod 755 uploads/ storage/ && find uploads/ storage/ -type f -exec chmod 644 {} \;
-6. Visit: https://ankurinfotech.com.np/admin/
+6. Visit: {SITE_URL}/admin/
 ```
 
 ### For Local Development
 
 ```bash
-# Using Replit or local MySQL
-git clone https://github.com/adakash26434/butwal.git
-cd butwal
+git clone {YOUR_REPO_URL}
+cd {PROJECT_DIR}
 
 # Create dev-config.php with your DB details
 cat > includes/dev-config.php << EOF
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'butwal_dev');
+define('DB_NAME', 'dev_db');
 define('DB_USER', 'root');
 define('DB_PASS', 'password');
 EOF
 
 # Database will auto-initialize on first access
-# Visit: http://localhost:5000/ (if using Replit)
 ```
 
 ---
@@ -67,7 +56,7 @@ EOF
 ## 📁 Project Structure
 
 ```
-butwal/
+project/
 ├── admin/                  # Admin panel pages
 │   ├── clients.php         # Client management
 │   ├── news.php            # News/blog management
@@ -94,7 +83,6 @@ butwal/
 ├── uploads/               # User uploads (NOT in git)
 ├── storage/               # Cache, logs (NOT in git)
 ├── database.sql           # MySQL schema for cPanel
-├── CPANEL_SETUP.md        # Deployment guide
 └── README.md              # This file
 ```
 
@@ -106,14 +94,14 @@ butwal/
 
 ```php
 // Database
-define('DB_HOST',    'localhost');      // MySQL host
-define('DB_NAME',    'ankurinfotechcom_admin');
-define('DB_USER',    'ankurinfotechcom_admin');
-define('DB_PASS',    'password');       // Set in dev-config.php
+define('DB_HOST',    'localhost');
+define('DB_NAME',    'your_database');
+define('DB_USER',    'your_username');
+define('DB_PASS',    'your_password');
 
 // Site
-define('SITE_URL',   'https://ankurinfotech.com.np');
-define('SITE_NAME',  'Ankur Infotech Pvt. Ltd.');
+define('SITE_URL',   'https://yourdomain.com');
+define('SITE_NAME',  'Your Company Name');
 
 // Uploads
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
@@ -127,7 +115,7 @@ Create this file locally — **never commit to git**:
 ```php
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'butwal_dev');
+define('DB_NAME', 'dev_db');
 define('DB_USER', 'root');
 define('DB_PASS', 'your_password');
 define('SITE_URL', 'http://localhost:5000');
@@ -250,7 +238,7 @@ Using **Tailwind CSS + Bootstrap 5**:
 
 ```bash
 # On cPanel server
-cd public_html/butwal
+cd public_html/{PROJECT_DIR}
 git pull origin main           # Pull latest changes
 
 # If database.sql changed:
@@ -259,8 +247,8 @@ mysql -u user -p db < database.sql
 
 ### Via FTP
 
-1. Download: `git clone https://github.com/adakash26434/butwal.git`
-2. Upload to: `public_html/butwal/`
+1. Download: `git clone {YOUR_REPO_URL}`
+2. Upload to: `public_html/{PROJECT_DIR}/`
 3. Import database in phpMyAdmin
 4. chmod uploads & storage directories
 
@@ -274,15 +262,6 @@ mysql -u user -p db < database.sql
 - ✅ CSRF tokens on forms
 - ✅ Rate limiting on auth endpoints
 - ✅ Never commit DB passwords (dev-config.php in .gitignore)
-
----
-
-## 📝 Documentation
-
-- **[CPANEL_SETUP.md](./CPANEL_SETUP.md)** - cPanel deployment guide
-- **[ISSUE_FIXES_FINAL.md](./ISSUE_FIXES_FINAL.md)** - Recent bug fixes & improvements
-- **[PROJECT_STATUS.md](./PROJECT_STATUS.md)** - Feature status & roadmap
-- **[database.sql](./database.sql)** - Database schema with instructions
 
 ---
 
@@ -311,30 +290,12 @@ In includes/config.php, set correct DB_HOST and DB_SOCKET for your server
 
 ---
 
-## 👥 Team
-
-- **Founder:** Ankur Infotech Pvt. Ltd.
-- **Location:** Butwal, Rupandehi, Nepal
-- **Contact:** ankurinfotech8@gmail.com
-- **Phone:** +977-071-438585, 071-437612
-
----
-
 ## 📄 License
 
-Private. All rights reserved by Ankur Infotech Pvt. Ltd.
+Private. All rights reserved.
 
 ---
 
-## 📞 Support
-
-For issues or questions:
-1. Check error logs in cPanel
-2. Review [CPANEL_SETUP.md](./CPANEL_SETUP.md) troubleshooting section
-3. Contact: ankurinfotech8@gmail.com
-
----
-
-**Last Updated:** 2026-06-03  
+**Last Updated:** 2026-06-08  
 **Status:** Production Ready ✅  
 **Version:** 1.2.0
