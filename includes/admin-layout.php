@@ -215,7 +215,7 @@ require __DIR__ . '/head.php';
 <div style="display:flex;height:100vh;overflow:hidden;">
 
   <!-- Admin Sidebar -->
-  <aside id="admin-sidebar" class="admin-sidebar" style="width:3.5rem;flex-shrink:0;display:flex;flex-direction:column;overflow:visible;background:var(--card);border-right:1px solid var(--border);transition:width 0.25s cubic-bezier(0.4,0,0.2,1);">
+  <aside id="admin-sidebar" class="admin-sidebar" style="position:fixed;left:0;top:0;bottom:0;width:3.5rem;flex-shrink:0;display:flex;flex-direction:column;overflow:visible;background:var(--card);border-right:1px solid var(--border);transition:width 0.25s cubic-bezier(0.4,0,0.2,1);z-index:200;">
     <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;width:14rem;margin-left:-2.25rem;opacity:0;transition:opacity 0.2s 0.05s;">
       <a href="<?= url('index.php') ?>" style="display:flex;align-items:center;gap:0.625rem;font-family:var(--font-display);font-weight:700;font-size:0.875rem;color:var(--foreground);text-decoration:none;">
         <?php if (!empty($__s['logo_url'])): ?>
@@ -382,7 +382,7 @@ require __DIR__ . '/head.php';
   </aside>
 
   <!-- Main -->
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+  <div id="admin-main-wrapper" style="flex:1;display:flex;flex-direction:column;overflow:hidden;margin-left:3.5rem;">
     <header style="background:var(--card);border-bottom:1px solid var(--border);padding:0 1.25rem;height:3.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <div style="display:flex;align-items:center;gap:0.75rem;">
         <!-- Mobile hamburger -->
