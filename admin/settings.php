@@ -779,8 +779,7 @@ $tabs = [
             <?php biI($s,'chairman_title','Title / Designation','Chairperson, Board of Directors','अध्यक्ष, सञ्चालक समिति') ?>
           </div>
           <div class="mb-1">
-            <label class="form-label">Photo URL <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
-            <input type="url" name="chairman_photo" class="form-input" value="<?= e(sv($s,'chairman_photo')) ?>" placeholder="https://...jpg">
+            <?php $imgField = 'chairman_photo'; $imgValue = sv($s,'chairman_photo'); $imgLabel = 'Chairman Photo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
           </div>
           <?php biTA($s,'chairman_message','Message','Write a message from the Chairman…','अध्यक्षज्यूको सन्देश लेख्नुस…',5,'','Leave blank to hide the Chairman card.') ?>
           <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
@@ -799,8 +798,7 @@ $tabs = [
             <?php biI($s,'ceo_title','Title / Designation','Chief Executive Officer','प्रमुख कार्यकारी अधिकृत') ?>
           </div>
           <div class="mb-1">
-            <label class="form-label">Photo URL <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
-            <input type="url" name="ceo_photo" class="form-input" value="<?= e(sv($s,'ceo_photo')) ?>" placeholder="https://...jpg">
+            <?php $imgField = 'ceo_photo'; $imgValue = sv($s,'ceo_photo'); $imgLabel = 'CEO Photo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
           </div>
           <?php biTA($s,'ceo_message','Message','Write a message from the CEO…','CEO को सन्देश लेख्नुस…',5,'','Leave blank to hide the CEO card.') ?>
           <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">

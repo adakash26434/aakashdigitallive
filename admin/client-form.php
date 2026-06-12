@@ -606,9 +606,9 @@ require_once '../includes/admin-layout.php';
                  onchange="previewLogo(this)">
           <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.375rem;">PNG, JPG, SVG or WebP — max 2 MB</p>
 
-          <label class="form-label" style="margin-top:1rem;margin-bottom:.5rem;">Or paste logo URL</label>
-          <input type="url" name="logo_url" class="form-input" placeholder="https://..." value="<?= $v('logo_url') ?>"
-                 oninput="if(this.value)document.getElementById('logo-preview').src=this.value">
+          <div style="margin-top:1rem;">
+            <?php $imgField = 'logo_url'; $imgValue = $v('logo_url'); $imgLabel = 'Client Logo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
+          </div>
           <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.25rem;">
             This logo appears in the homepage client scroll strip. Leave blank to hide from homepage.
           </p>

@@ -202,9 +202,8 @@ if (isset($_GET['edit'])) {
           <span class="form-hint">Optional. Where users go when they click the banner. Must start with https:// or http://</span>
         </div>
         <div>
-          <label class="form-label">Image URL</label>
-          <input type="url" name="image_url" class="form-input" value="<?= e($edit['image_url'] ?? '') ?>" placeholder="https://example.com/image.jpg">
-          <span class="form-hint">Optional. Full URL to the banner image. Works best with images 1200x400px or larger.</span>
+          <?php $imgField = 'image_url'; $imgValue = $edit['image_url'] ?? ''; $imgLabel = 'Banner Image'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
+          <span class="form-hint">Works best with images 1200x400px or larger.</span>
         </div>
         <div>
           <label class="form-label">Button Text</label>
