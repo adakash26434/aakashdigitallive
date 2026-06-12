@@ -1,0 +1,79 @@
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.5); /* blue-500 */
+  filter: blur(8px);
+  animation: float-up 10s infinite linear;
+}
+
+.particle:nth-child(1) { width: 40px; height: 40px; left: 20%; bottom: 10%; animation-duration: 8s; animation-delay: 0s; }
+.particle:nth-child(2) { width: 60px; height: 60px; left: 50%; bottom: 5%; animation-duration: 12s; animation-delay: 2s; }
+.particle:nth-child(3) { width: 30px; height: 30px; left: 80%; bottom: 15%; animation-duration: 9s; animation-delay: 4s; }
+.particle:nth-child(4) { width: 50px; height: 50px; left: 35%; bottom: -5%; animation-duration: 11s; animation-delay: 1s; }
+.particle:nth-child(5) { width: 45px; height: 45px; left: 70%; bottom: 0%; animation-duration: 10s; animation-delay: 3s; }
+
+@keyframes float-tilt {
+  0%, 100% { transform: translateY(0) rotate(4deg); }
+  50% { transform: translateY(-15px) rotate(4deg); }
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float-tilt {
+  animation: float-tilt 6s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s ease-out forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+
+/* New classes for MeshGradient */
+@keyframes mesh-float {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-mesh-float {
+  animation: mesh-float 8s ease-in-out infinite;
+}
+
+.animate-mesh-float-delayed {
+  animation: mesh-float 8s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.animate-mesh-float-slow {
+  animation: mesh-float 10s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+.bg-grid-white {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
