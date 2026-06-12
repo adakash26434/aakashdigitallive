@@ -108,7 +108,7 @@ require __DIR__ . '/head.php';
           ['users.php',            'user',          'Users'],
           ['staff.php',            'user-cog',      'Staff'],
           ['support-contacts.php', 'phone',         'Support Contacts'],
-          ['audit-log.php',        'search',        'Audit Log'],
+          ['audit-log.php',        'scroll-text',   'Audit Log'],
         ],
       ];
 
