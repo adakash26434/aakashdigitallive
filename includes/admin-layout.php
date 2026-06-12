@@ -242,9 +242,128 @@ require __DIR__ . '/head.php';
           $__bsw = renderBranchSwitcher();
           if ($__bsw) echo $__bsw;
         ?>
-        <form method="get" action="<?= url('admin/search.php') ?>" style="display:flex;">
-          <input name="q" placeholder="Search…" class="admin-topbar-search" aria-label="Search admin">
-        </form>
+        <div class="topbar-search-wrap" id="topbar-search-wrap">
+          <form method="get" action="<?= url('admin/search.php') ?>" style="display:flex;" onsubmit="topbarSearchSubmit(event)">
+            <input name="q" id="topbar-q" placeholder="Search…" class="admin-topbar-search"
+                   aria-label="Search admin" autocomplete="off"
+                   oninput="topbarSearchInput(this.value)"
+                   onkeydown="topbarSearchKey(event)"
+                   onfocus="if(this.value.length>=2)topbarDrop().classList.add('open')">
+          </form>
+          <div id="topbar-search-drop" role="listbox" aria-label="Search results"></div>
+        </div>
+        <script>
+        (function(){
+          var _q='', _timer=null, _xhr=null, _idx=-1;
+          var SEARCH_URL='<?= url('api/admin-search.php') ?>';
+          var FULL_URL='<?= url('admin/search.php') ?>';
+
+          window.topbarDrop=function(){ return document.getElementById('topbar-search-drop'); }
+
+          function closeDrop(){ topbarDrop().classList.remove('open'); _idx=-1; }
+          function openDrop(){ topbarDrop().classList.add('open'); }
+
+          // Close on outside click
+          document.addEventListener('click', function(e){
+            if(!document.getElementById('topbar-search-wrap').contains(e.target)) closeDrop();
+          });
+
+          window.topbarSearchInput=function(val){
+            _idx=-1;
+            if(val.length < 2){ closeDrop(); return; }
+            if(val===_q) return;
+            _q=val;
+            clearTimeout(_timer);
+            _timer=setTimeout(function(){ fetchResults(val); }, 220);
+            // Show spinner immediately
+            topbarDrop().innerHTML='<div class="tsd-spinner">Searching…</div>';
+            openDrop();
+          };
+
+          window.topbarSearchKey=function(e){
+            var drop=topbarDrop();
+            var items=drop.querySelectorAll('.tsd-item');
+            if(e.key==='ArrowDown'){
+              e.preventDefault();
+              _idx=Math.min(_idx+1, items.length-1);
+              items.forEach(function(el,i){ el.classList.toggle('kbd-active',i===_idx); });
+              if(items[_idx]) items[_idx].scrollIntoView({block:'nearest'});
+            } else if(e.key==='ArrowUp'){
+              e.preventDefault();
+              _idx=Math.max(_idx-1, -1);
+              items.forEach(function(el,i){ el.classList.toggle('kbd-active',i===_idx); });
+              if(_idx>=0 && items[_idx]) items[_idx].scrollIntoView({block:'nearest'});
+            } else if(e.key==='Enter' && _idx>=0 && items[_idx]){
+              e.preventDefault();
+              window.location.href=items[_idx].getAttribute('href');
+            } else if(e.key==='Escape'){
+              closeDrop();
+              document.getElementById('topbar-q').blur();
+            }
+          };
+
+          window.topbarSearchSubmit=function(e){
+            if(_idx>=0){
+              var items=topbarDrop().querySelectorAll('.tsd-item');
+              if(items[_idx]){ e.preventDefault(); window.location.href=items[_idx].getAttribute('href'); return; }
+            }
+            closeDrop();
+          };
+
+          function fetchResults(val){
+            if(_xhr){ _xhr.abort(); }
+            _xhr=new XMLHttpRequest();
+            _xhr.open('GET', SEARCH_URL+'?q='+encodeURIComponent(val), true);
+            _xhr.onreadystatechange=function(){
+              if(_xhr.readyState!==4) return;
+              if(_xhr.status!==200){ topbarDrop().innerHTML='<div class="tsd-empty">Search unavailable</div>'; return; }
+              try{ renderResults(JSON.parse(_xhr.responseText), val); }
+              catch(err){ topbarDrop().innerHTML='<div class="tsd-empty">Parse error</div>'; }
+            };
+            _xhr.send();
+          }
+
+          // Icon SVG map (inline mini Lucide paths)
+          var ICONS={
+            'building-2':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
+            'ticket':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>',
+            'user':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            'shopping-cart':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
+            'mail':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+            'target':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            'package':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="7.5" y1="4.21" x2="7.5" y2="9.29"/></svg>',
+            'newspaper':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>',
+          };
+          var DEFAULT_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+
+          function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+          function renderResults(data, val){
+            var drop=topbarDrop();
+            if(!data.results || data.results.length===0){
+              drop.innerHTML='<div class="tsd-empty">No results for "<strong>'+esc(val)+'</strong>"</div>';
+              openDrop(); return;
+            }
+            var html='';
+            data.results.forEach(function(group){
+              html+='<div class="tsd-group-label">'+esc(group.label)+'</div>';
+              group.rows.forEach(function(row){
+                var ico=ICONS[group.icon]||DEFAULT_ICON;
+                html+='<a class="tsd-item" href="'+esc(row.url)+'" role="option">'
+                    +'<div class="tsd-item-icon">'+ico+'</div>'
+                    +'<div class="tsd-item-body">'
+                    +'<div class="tsd-item-title">'+esc(row.title)+'</div>'
+                    +(row.meta?'<div class="tsd-item-meta">'+esc(row.meta)+'</div>':'')
+                    +'</div></a>';
+              });
+            });
+            html+='<div class="tsd-footer"><a href="'+FULL_URL+'?q='+encodeURIComponent(val)+'">See all results for "'+esc(val)+'" →</a></div>';
+            drop.innerHTML=html;
+            _idx=-1;
+            openDrop();
+          }
+        })();
+        </script>
         <a href="<?= url('index.php') ?>" target="_blank" class="btn btn-ghost btn-sm fs-xs">
           View site ↗
         </a>
