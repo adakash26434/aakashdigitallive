@@ -42,7 +42,7 @@ if (!defined('UPLOAD_URL')) define('UPLOAD_URL', SITE_URL . '/uploads/');
 // OR use any 40+ character random string.
 //
 // ★ PASTE YOUR KEY HERE (replace the empty string):
-define('APP_SECRET_KEY', '');   // <-- paste your key between the quotes
+if (!defined('APP_SECRET_KEY')) define('APP_SECRET_KEY', '');   // <-- paste your key between the quotes
 
 if (!defined('SESSION_SECRET')) {
     // Try environment variable first (cPanel PHP Env Vars)
