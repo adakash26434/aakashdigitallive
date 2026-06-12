@@ -1425,11 +1425,14 @@ html.dark .st-dropdown {
   letter-spacing: -0.01em;
 }
 #st-brand-logo {
-  height: 2rem;
+  height: 2.5rem;
   width: auto;
-  max-width: 13rem;
+  max-width: 14rem;
   object-fit: contain;
   border-radius: 0;
+}
+@media (max-width: 640px) {
+  #st-brand-logo { height: 2rem; }
 }
 #st-brand-monogram {
   display: grid;
