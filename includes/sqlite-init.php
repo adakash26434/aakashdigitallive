@@ -406,7 +406,8 @@ function sqliteMigrate(PDO $pdo): void {
     // Add missing columns to existing tables (migrations)
     $migrationSql = [
         // Team members category support (v1.2.0)
-        "ALTER TABLE team_members ADD COLUMN category TEXT NOT NULL DEFAULT 'management' AFTER is_leadership",
+        // NOTE: SQLite does not support AFTER — column is appended to the end.
+        "ALTER TABLE team_members ADD COLUMN category TEXT NOT NULL DEFAULT 'management'",
     ];
     
     foreach ($migrationSql as $sql) {
@@ -743,7 +744,7 @@ function sqliteMigrate(PDO $pdo): void {
     );
     ");
 
-    // Services table — add columns introduced after initial schema (idempotent: ignore if already exists)
+    // Services table — add columns introduced after initial schema (idempotent)
     foreach ([
         "ALTER TABLE services ADD COLUMN tagline TEXT DEFAULT ''",
         "ALTER TABLE services ADD COLUMN badge TEXT DEFAULT ''",
@@ -752,10 +753,15 @@ function sqliteMigrate(PDO $pdo): void {
         "ALTER TABLE services ADD COLUMN highlights TEXT DEFAULT '[]'",
         "ALTER TABLE services ADD COLUMN screenshot_url TEXT DEFAULT NULL",
     ] as $__col) {
-        try { $pdo->exec($__col); } catch (\Throwable $ignored) { error_log('[' . basename(__FILE__) . ']' . $ignored->getMessage()); }
+        try { $pdo->exec($__col); } catch (\Throwable $ignored) {
+            $__msg = $ignored->getMessage();
+            if (strpos($__msg, 'duplicate column') === false && strpos($__msg, 'already exists') === false) {
+                error_log('[' . basename(__FILE__) . ']' . $__msg);
+            }
+        }
     }
 
-    // Products table — add columns introduced after initial schema (idempotent: ignore if already exists)
+    // Products table — add columns introduced after initial schema (idempotent)
     foreach ([
         "ALTER TABLE products ADD COLUMN lucide_icon TEXT DEFAULT 'package'",
         "ALTER TABLE products ADD COLUMN icon_color TEXT DEFAULT 'blue'",
@@ -767,7 +773,12 @@ function sqliteMigrate(PDO $pdo): void {
         "ALTER TABLE products ADD COLUMN demo_screenshot_url TEXT DEFAULT NULL",
         "ALTER TABLE products ADD COLUMN tab_label TEXT DEFAULT NULL",
     ] as $__col) {
-        try { $pdo->exec($__col); } catch (\Throwable $ignored) { error_log('[' . basename(__FILE__) . ']' . $ignored->getMessage()); }
+        try { $pdo->exec($__col); } catch (\Throwable $ignored) {
+            $__msg = $ignored->getMessage();
+            if (strpos($__msg, 'duplicate column') === false && strpos($__msg, 'already exists') === false) {
+                error_log('[' . basename(__FILE__) . ']' . $__msg);
+            }
+        }
     }
 }
 

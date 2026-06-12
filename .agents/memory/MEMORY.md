@@ -1,0 +1,2 @@
+- [SQLite migration patterns](sqlite-migration.md) — SQLite has no AFTER in ALTER TABLE; idempotent migrations must suppress "duplicate column" not just log blindly.
+- [Admin sidebar CSS approach](admin-sidebar-css.md) — Uses max-width transition on .sb-label elements (not display:none toggling); sidebar overflow:hidden clips content naturally on collapse.

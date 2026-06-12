@@ -83,18 +83,21 @@ try {
 ?>
 
 <!-- Top stats grid -->
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.875rem;margin-bottom:1.75rem;">
+<?php
+$__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Applications','Live Chats','Replied (Awaiting)'];
+?>
+<div class="admin-stat-grid">
   <?php foreach($stats as [$label,$value,$iconName,$bg,$col,$href]):?>
-  <a href="<?=$href?>" style="display:flex;flex-direction:column;padding:1rem 1.125rem;border-radius:0.875rem;border:1px solid var(--border);background:var(--card);text-decoration:none;transition:box-shadow 0.2s,border-color 0.2s;"
-     onmouseover="this.style.boxShadow='var(--shadow-elevated)';this.style.borderColor='<?=$col?>'" onmouseout="this.style.boxShadow='';this.style.borderColor='var(--border)'">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.625rem;">
-      <span style="color:<?=$col?>"><?= icon($iconName,18,'color:'.$col.';flex-shrink:0;') ?></span>
-      <?php if($value > 0 && in_array($label, ['Open Tickets','New Contacts','Demo Requests','Job Applications','Live Chats','Replied (Awaiting)'])):?>
-      <span style="width:0.4375rem;height:0.4375rem;border-radius:9999px;background:<?=$col?>;display:inline-block;"></span>
+  <a href="<?=$href?>" class="admin-stat-card"
+     onmouseover="this.style.borderColor='<?=$col?>'" onmouseout="this.style.borderColor=''">
+    <div class="admin-stat-card__top">
+      <span style="color:<?=$col?>;display:flex;"><?= icon($iconName,18,'color:'.$col.';flex-shrink:0;') ?></span>
+      <?php if($value > 0 && in_array($label, $__alertLabels)):?>
+      <span class="admin-stat-card__dot" style="background:<?=$col?>;"></span>
       <?php endif;?>
     </div>
-    <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:<?=$col?>;"><?=$value?></div>
-    <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.1875rem;font-weight:500;"><?=e($label)?></div>
+    <div class="admin-stat-card__value" style="color:<?=$col?>;"><?=$value?></div>
+    <div class="admin-stat-card__label"><?=e($label)?></div>
   </a>
   <?php endforeach;?>
 </div>

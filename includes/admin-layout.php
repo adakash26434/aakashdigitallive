@@ -12,288 +12,116 @@ $__currentPath = basename($_SERVER['PHP_SELF']);
 <html lang="en" id="html-root">
 <head>
 <?php
-$headContext = 'admin';
-$pageTitle = ($pageTitle ?? 'Admin') . ' — Admin | ' . SITE_NAME;
+$headContext    = 'admin';
+$__pageHeader   = $pageTitle ?? 'Admin';
+$pageTitle      = $__pageHeader . ' — Admin | ' . SITE_NAME;
 require __DIR__ . '/head.php';
 ?>
-<style>
-/* ── Base sidebar element classes (used throughout nav render loop) ── */
-.sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4375rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.sidebar-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
-  opacity: 0.75;
-}
-.sidebar-link.active .sidebar-icon,
-.sidebar-link:hover .sidebar-icon { opacity: 1; }
-
-/* ── Admin sidebar colour overrides ── */
-.admin-sidebar { 
-  background: var(--background);
-  border-right: 1px solid var(--border);
-}
-.admin-sidebar .sidebar-link { 
-  color: var(--muted-foreground); 
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.admin-sidebar .sidebar-link:hover { 
-  background: var(--sidebar-hover-bg, rgba(241,245,249,0.06)); 
-  color: var(--primary);
-}
-.admin-sidebar .sidebar-link.active { 
-  background: var(--primary-light); 
-  color: var(--primary);
-}
-.admin-sidebar .divider { 
-  background: var(--border);
-}
-
-/* ── Admin sidebar icon styling (dark mode support) ── */
-.admin-sidebar .sidebar-icon { 
-  color: var(--muted-foreground); 
-  opacity: 1; 
-  transition: color 0.15s; 
-  flex-shrink: 0;
-}
-.admin-sidebar .sidebar-link:hover .sidebar-icon { 
-  color: var(--primary);
-  opacity: 1; 
-}
-.admin-sidebar .sidebar-link.active .sidebar-icon { 
-  color: var(--primary);
-  opacity: 1;
-}
-.admin-sidebar .sidebar-link:hover { 
-  color: var(--primary);
-}
-
-/* ── Sidebar tooltip on hover (show full text on hover, icons-only normally) ── */
-@media (min-width: 768px) {
-  #admin-sidebar {
-    width: 3.5rem;
-    transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
-  }
-  #admin-sidebar:hover {
-    width: 14rem;
-    z-index: 210;
-  }
-  /* Hide header text when collapsed */
-  #admin-sidebar > div:first-child {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    width: 14rem;
-    margin-left: -2.25rem;
-  }
-  /* Show header text when expanded */
-  #admin-sidebar:hover > div:first-child {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  /* Hide link text labels when collapsed */
-  .sidebar-link span:last-child {
-    display: none;
-    white-space: nowrap;
-    margin-left: 0;
-  }
-  /* Show link text labels when expanded */
-  #admin-sidebar:hover .sidebar-link span:last-child {
-    display: inline-block;
-    margin-left: 0;
-  }
-  .sidebar-link {
-    justify-content: center;
-    gap: 0;
-    width: 100%;
-  }
-  /* Center icons when collapsed */
-  #admin-sidebar:not(:hover) .sidebar-link {
-    padding: 0.625rem;
-    justify-content: center;
-    gap: 0;
-  }
-  /* Left-align when expanded */
-  #admin-sidebar:hover .sidebar-link {
-    padding: 0.5rem 0.75rem;
-    justify-content: flex-start;
-    gap: 0.75rem;
-  }
-  /* Auto-hide overlay when sidebar not open on desktop */
-  #admin-sidebar-overlay {
-    display: none !important;
-  }
-
-  /* ── Group header buttons: hide text & chevron when collapsed ── */
-  #admin-sidebar:not(:hover) .nav-group-btn .nav-group-label,
-  #admin-sidebar:not(:hover) .nav-group-btn .nav-group-chevron {
-    display: none;
-  }
-  #admin-sidebar:not(:hover) .nav-group-btn {
-    justify-content: center;
-    gap: 0;
-    padding: 0.625rem;
-  }
-  #admin-sidebar:hover .nav-group-btn {
-    justify-content: flex-start;
-    gap: 0.625rem;
-    padding: 0.5rem 0.75rem;
-  }
-
-  /* ── Group child containers: hide when collapsed ── */
-  #admin-sidebar:not(:hover) .nav-group-children {
-    display: none !important;
-  }
-
-  /* ── Bottom section: hide user info & labels when collapsed ── */
-  #admin-sidebar:not(:hover) .sidebar-user-info,
-  #admin-sidebar:not(:hover) .sidebar-user-role,
-  #admin-sidebar:not(:hover) .sidebar-logout-label {
-    display: none;
-  }
-  #admin-sidebar:not(:hover) .sidebar-user-avatar-section {
-    justify-content: center;
-    padding: 0.5rem;
-  }
-}
-
-
-
-/* Mobile sidebar overlay */
-@media (max-width: 767px) {
-  #admin-sidebar {
-    position: fixed !important;
-    left: 0; top: 0; bottom: 0;
-    z-index: 200;
-    transform: translateX(-100%);
-    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    box-shadow: 4px 0 24px rgba(15,23,42,0.35);
-  }
-  #admin-sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-  #admin-sidebar-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 199;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(2px);
-  }
-  #admin-sidebar-overlay.show { display: block; }
-}
-
-/* af-split / af-panel / af-form-footer defined in assets/css/admin-forms.css */
-</style>
 </head>
 <body style="min-height:100vh;background:var(--background);color:var(--foreground);">
 
-<!-- Mobile sidebar backdrop -->
+<!-- Mobile overlay -->
 <div id="admin-sidebar-overlay" onclick="closeAdminSidebar()"></div>
 
-<div style="display:flex;height:100vh;overflow:hidden;">
+<div id="admin-shell">
 
-  <!-- Admin Sidebar -->
-  <aside id="admin-sidebar" class="admin-sidebar" style="position:fixed;left:0;top:0;bottom:0;width:3.5rem;flex-shrink:0;display:flex;flex-direction:column;overflow:visible;background:var(--card);border-right:1px solid var(--border);transition:width 0.25s cubic-bezier(0.4,0,0.2,1);z-index:200;">
-    <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;width:14rem;margin-left:-2.25rem;opacity:0;transition:opacity 0.2s 0.05s;">
-      <a href="<?= url('index.php') ?>" style="display:flex;align-items:center;gap:0.625rem;font-family:var(--font-display);font-weight:700;font-size:0.875rem;color:var(--foreground);text-decoration:none;">
-        <?php if (!empty($__s['logo_url'])): ?>
-          <img src="<?= e($__s['logo_url']) ?>" alt="<?= e($__s['site_name'] ?? SITE_NAME) ?>" style="height:1.75rem;width:auto;max-width:8rem;object-fit:contain;border-radius:0;">
-        <?php else: ?>
-          <span style="display:grid;place-items:center;width:1.875rem;height:1.875rem;border-radius:0.5rem;background:var(--gradient-primary);color:#fff;font-weight:800;font-size:0.6875rem;"><?= strtoupper(substr(defined('SITE_NAME') ? SITE_NAME : 'NI', 0, 2)) ?></span>
-        <?php endif; ?>
-        Admin Panel
-      </a>
-      <!-- Close button (mobile only) -->
-      <button id="admin-sidebar-close-btn" onclick="closeAdminSidebar()" style="display:none;width:1.875rem;height:1.875rem;border-radius:0.375rem;border:none;background:var(--muted);cursor:pointer;color:var(--muted-foreground);align-items:center;justify-content:center;" title="Close"><?= icon('x',16) ?></button>
+  <!-- ══════════════════════════════════════════════════════
+       SIDEBAR
+       ══════════════════════════════════════════════════════ -->
+  <aside id="admin-sidebar">
+
+    <!-- Header / Brand -->
+    <div class="sb-header">
+      <?php if (!empty($__s['logo_url'])): ?>
+        <a href="<?= url('admin/index.php') ?>" class="sb-logo">
+          <img src="<?= e($__s['logo_url']) ?>" alt="<?= e($__s['site_name'] ?? SITE_NAME) ?>">
+        </a>
+      <?php else: ?>
+        <a href="<?= url('admin/index.php') ?>" class="sb-logo">
+          <?= strtoupper(substr(SITE_NAME, 0, 2)) ?>
+        </a>
+      <?php endif; ?>
+      <span class="sb-brand">Admin Panel</span>
+      <button type="button" onclick="closeAdminSidebar()" class="sb-close-btn"
+              id="admin-sidebar-close-btn" title="Close menu">
+        <?= icon('x', 16) ?>
+      </button>
     </div>
-    <nav style="flex:1;padding:0.625rem;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;" id="admin-nav">
+
+    <!-- Nav -->
+    <nav class="sb-nav" id="admin-nav">
       <?php
-      // Direct links (always visible)
+      // ── Direct top-level links ────────────────────────────────
       $directLinks = [
-        ['index.php',     icon('layout-dashboard',15), 'Dashboard'],
-        ['analytics.php', icon('bar-chart-2',15),      'Analytics'],
-        ['search.php',    icon('search',15),           'Global Search'],
-        ['branches.php',  icon('git-branch',15),       'Branches'],
-        ['status.php',    icon('activity',15),         'Status Page'],
+        ['index.php',     'layout-dashboard', 'Dashboard'],
+        ['analytics.php', 'bar-chart-2',      'Analytics'],
+        ['search.php',    'search',           'Global Search'],
+        ['branches.php',  'git-branch',       'Branches'],
+        ['status.php',    'activity',         'Status Page'],
       ];
-      // Grouped sections — key = label, value = items array
+
+      // ── Grouped sections ──────────────────────────────────────
       $adminNavGroups = [
         'Content' => [
-          ['page-content.php',  icon('layout-grid',15),     'Page Content (CMS)'],
-          ['team.php', icon('users',15), 'Team'],
-          ['services.php', icon('settings',15), 'Services'],
-          ['products.php', icon('package',15), 'Products'],
-          ['portfolio.php', icon('briefcase',15), 'Portfolio'],
-          ['testimonials.php', icon('star',15), 'Testimonials'],
-          ['gallery.php', icon('image',15), 'Gallery'],
-          ['partners.php', icon('handshake',15), 'Partners'],
-          ['pricing.php', icon('tag',15), 'Pricing Plans'],
-          ['pricing-table.php', icon('table',15), 'Pricing Table'],
-          ['news.php', icon('newspaper',15), 'News & Blog'],
-          ['faqs.php', icon('help-circle',15), 'FAQs'],
-          ['careers.php',       icon('clipboard-list',15), 'Careers'],
-          ['tech-expertise.php',icon('cpu',15),           'Tech Expertise'],
-          ['pages.php',         icon('file-text',15),     'CMS Pages'],
-          ['legal.php',         icon('shield',15),        'Legal Pages'],
+          ['page-content.php',   'layout-grid',    'Page Content (CMS)'],
+          ['team.php',           'users',           'Team'],
+          ['services.php',       'settings',        'Services'],
+          ['products.php',       'package',         'Products'],
+          ['portfolio.php',      'briefcase',       'Portfolio'],
+          ['testimonials.php',   'star',            'Testimonials'],
+          ['gallery.php',        'image',           'Gallery'],
+          ['partners.php',       'handshake',       'Partners'],
+          ['pricing.php',        'tag',             'Pricing Plans'],
+          ['pricing-table.php',  'table',           'Pricing Table'],
+          ['news.php',           'newspaper',       'News & Blog'],
+          ['faqs.php',           'help-circle',     'FAQs'],
+          ['careers.php',        'clipboard-list',  'Careers'],
+          ['tech-expertise.php', 'cpu',             'Tech Expertise'],
+          ['pages.php',          'file-text',       'CMS Pages'],
+          ['legal.php',          'shield',          'Legal Pages'],
         ],
         'CRM' => [
-          ['clients.php', icon('building-2',15), 'Clients'],
-          ['contacts.php', icon('mail',15), 'Contacts'],
-          ['orders.php', icon('shopping-cart',15), 'Orders'],
-          ['subscribers.php', icon('mail-check',15), 'Subscribers'],
-          ['demo-requests.php', icon('telescope',15), 'Demo Requests'],
-          ['applications.php', icon('clipboard',15), 'Job Applications'],
-          ['crm.php', icon('target',15), 'CRM & Follow-ups'],
+          ['clients.php',        'building-2',      'Clients'],
+          ['contacts.php',       'mail',            'Contacts'],
+          ['orders.php',         'shopping-cart',   'Orders'],
+          ['subscribers.php',    'mail-check',      'Subscribers'],
+          ['demo-requests.php',  'telescope',       'Demo Requests'],
+          ['applications.php',   'clipboard',       'Job Applications'],
+          ['crm.php',            'target',          'CRM & Follow-ups'],
         ],
         'Support' => [
-          ['tickets.php', icon('ticket',15), 'Tickets'],
-          ['sla.php', icon('timer',15), 'SLA Policies'],
-          ['email-intake.php', icon('mail',15), 'Email Intake'],
-          ['kb.php', icon('book-open',15), 'Knowledge Base'],
-          ['livechat.php', icon('message-circle',15), 'Live Chat'],
-          ['announcements.php', icon('megaphone',15), 'Announcements'],
-          ['banners.php', icon('layout-template',15), 'Banners'],
+          ['tickets.php',        'ticket',          'Tickets'],
+          ['sla.php',            'timer',           'SLA Policies'],
+          ['email-intake.php',   'mail',            'Email Intake'],
+          ['kb.php',             'book-open',       'Knowledge Base'],
+          ['livechat.php',       'message-circle',  'Live Chat'],
+          ['announcements.php',  'megaphone',       'Announcements'],
+          ['banners.php',        'layout-template', 'Banners'],
         ],
         'Subscriptions' => [
-          ['subscriptions.php', icon('repeat',15), 'Subscriptions'],
-          ['licenses.php', icon('key-round',15), 'License Keys'],
+          ['subscriptions.php',  'repeat',          'Subscriptions'],
+          ['licenses.php',       'key-round',       'License Keys'],
         ],
-
         'Settings' => [
-          ['settings.php', icon('settings-2',15), 'Settings'],
-          ['company-settings.php', icon('building-2',15), 'Company Settings'],
-          ['users.php', icon('user',15), 'Users'],
-          ['staff.php', icon('user-cog',15), 'Staff'],
-          ['support-contacts.php', icon('phone',15), 'Support Contacts'],
-          ['audit-log.php', icon('search',15), 'Audit Log'],
+          ['settings.php',         'settings-2',    'Settings'],
+          ['company-settings.php', 'building-2',    'Company Settings'],
+          ['users.php',            'user',          'Users'],
+          ['staff.php',            'user-cog',      'Staff'],
+          ['support-contacts.php', 'phone',         'Support Contacts'],
+          ['audit-log.php',        'search',        'Audit Log'],
         ],
-        // Superadmin-only section — rendered separately below
-
       ];
 
-      // Determine which group is active
+      // Group icon map
+      $grpIcons = [
+        'Content'       => 'file-text',
+        'CRM'           => 'target',
+        'Support'       => 'headphones',
+        'Subscriptions' => 'repeat',
+        'Settings'      => 'sliders-horizontal',
+      ];
+
+      // Which group is active?
       $activeGroup = null;
       foreach ($adminNavGroups as $grpLabel => $grpItems) {
         foreach ($grpItems as $n) {
@@ -302,39 +130,42 @@ require __DIR__ . '/head.php';
       }
 
       // Render direct links
-      foreach ($directLinks as [$file,$icon,$label]):
+      foreach ($directLinks as [$file, $iconName, $label]):
         $active = $__currentPath === $file;
       ?>
-      <a href="<?= url('admin/'.$file) ?>" onclick="closeAdminSidebar()" class="sidebar-link <?= $active ? 'active' : '' ?>" style="margin-bottom:0.125rem;">
-        <span class="sidebar-icon"><?= $icon ?></span>
-        <span class="fs-sm2"><?= e($label) ?></span>
+      <a href="<?= url('admin/' . $file) ?>" onclick="closeAdminSidebar()"
+         class="sb-link<?= $active ? ' active' : '' ?>">
+        <span class="sb-icon"><?= icon($iconName, 15) ?></span>
+        <span class="sb-label"><?= e($label) ?></span>
       </a>
       <?php endforeach; ?>
 
-      <div class="divider" style="height:1px;margin:0.5rem 0.25rem;"></div>
+      <div class="sb-divider"></div>
 
       <?php foreach ($adminNavGroups as $grpLabel => $grpItems):
         $isActive = $activeGroup === $grpLabel;
-        $grpId = 'nav-grp-' . strtolower(preg_replace('/\W+/', '-', $grpLabel));
-        $grpIconMap = ['Content'=>icon('file-text',14),'CRM'=>icon('target',14),'Support'=>icon('headphones',14),'Subscriptions'=>icon('repeat',14),'Settings'=>icon('sliders-horizontal',14)];
-        $grpIcon = $grpIconMap[$grpLabel] ?? icon('folder',14);
+        $grpId    = 'nav-grp-' . strtolower(preg_replace('/\W+/', '-', $grpLabel));
+        $grpIcon  = $grpIcons[$grpLabel] ?? 'folder';
       ?>
-      <div style="margin-bottom:0.125rem;">
-        <button onclick="toggleNavGroup('<?= $grpId ?>')" class="nav-group-btn"
-          style="width:100%;display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;border:none;background:<?= $isActive ? 'rgba(59,130,246,0.12)' : 'transparent' ?>;cursor:pointer;color:<?= $isActive ? '#60a5fa' : 'rgba(241,245,249,0.55)' ?>;transition:background 0.15s;text-align:left;"
-          onmouseover="if(!this.classList.contains('grp-active'))this.style.background='rgba(241,245,249,0.06)'"
-          onmouseout="if(!this.classList.contains('grp-active'))this.style.background='<?= $isActive ? 'rgba(59,130,246,0.12)' : 'transparent' ?>'">
-          <span class="fs-md"><?= $grpIcon ?></span>
-          <span class="nav-group-label" style="font-size:0.8125rem;font-weight:600;flex:1;min-width:0;"><?= $grpLabel ?></span>
-          <span class="nav-group-chevron" id="<?= $grpId ?>-chevron" style="display:flex;transition:transform 0.2s;<?= $isActive ? 'transform:rotate(180deg)' : '' ?>"><?= icon('chevron-down',13) ?></span>
+      <div>
+        <button type="button" onclick="toggleNavGroup('<?= $grpId ?>')"
+                class="sb-group-btn<?= $isActive ? ' grp-active' : '' ?>">
+          <span class="sb-icon"><?= icon($grpIcon, 14) ?></span>
+          <span class="sb-label sb-group-spacer"><?= e($grpLabel) ?></span>
+          <span class="sb-chevron<?= $isActive ? ' open' : '' ?>" id="<?= $grpId ?>-chevron">
+            <?= icon('chevron-down', 13) ?>
+          </span>
         </button>
-        <div id="<?= $grpId ?>" class="nav-group-children" style="overflow:hidden;padding-left:0.5rem;<?= $isActive ? '' : 'display:none;' ?>">
 
-          <?php foreach ($grpItems as [$file,$icon,$label]):
+        <div id="<?= $grpId ?>" class="sb-group-children"
+             style="<?= $isActive ? '' : 'display:none;' ?>">
+          <?php foreach ($grpItems as [$file, $iconName, $label]):
             $active = $__currentPath === $file; ?>
-          <a href="<?= url('admin/'.$file) ?>" onclick="closeAdminSidebar()" class="sidebar-link fs-sm2 <?= $active ? 'active' : '' ?>" style="margin-bottom:0.125rem;">
-            <span class="sidebar-icon"><?= $icon ?></span>
-            <span><?= e($label) ?></span>
+          <a href="<?= url('admin/' . $file) ?>" onclick="closeAdminSidebar()"
+             class="sb-link<?= $active ? ' active' : '' ?>"
+             style="font-size:0.7875rem;padding-left:0.875rem;">
+            <span class="sb-icon"><?= icon($iconName, 13) ?></span>
+            <span class="sb-label"><?= e($label) ?></span>
           </a>
           <?php endforeach; ?>
         </div>
@@ -342,74 +173,97 @@ require __DIR__ . '/head.php';
       <?php endforeach; ?>
 
       <?php if (isSuperAdmin()): ?>
-      <div class="divider" style="height:1px;margin:0.5rem 0.25rem;"></div>
+      <div class="sb-divider"></div>
       <?php $saActive = $__currentPath === 'manage-admins.php'; ?>
       <a href="<?= url('admin/manage-admins.php') ?>" onclick="closeAdminSidebar()"
-         class="sidebar-link <?= $saActive ? 'active' : '' ?>"
-         style="margin-bottom:0.125rem;background:<?=$saActive?'rgba(236,72,153,0.15)':'transparent'?>;color:<?=$saActive?'#f472b6':'rgba(241,245,249,0.55)'?>;">
-        <span class="sidebar-icon"><?= icon('shield',15) ?></span>
-        <span style="font-size:0.8125rem;font-weight:600;">Manage Admins</span>
+         class="sb-link<?= $saActive ? ' active' : '' ?>"
+         style="<?= $saActive ? 'background:rgba(236,72,153,0.12);color:#ec4899;' : '' ?>">
+        <span class="sb-icon"><?= icon('shield', 15) ?></span>
+        <span class="sb-label" style="font-weight:600;">Manage Admins</span>
       </a>
       <?php endif; ?>
 
-      <div class="divider" style="height:1px;margin:0.5rem 0.25rem;"></div>
+      <div class="sb-divider"></div>
       <?php foreach ([
         ['security.php',    'shield',   'My 2FA'],
         ['sessions.php',    'activity', 'My Sign-ins'],
         ['cron-status.php', 'clock',    'Cron Status'],
-      ] as $tl): [$tf,$ti,$tlabel] = $tl; $tA = $__currentPath === $tf; ?>
-      <a href="<?= url('admin/'.$tf) ?>" onclick="closeAdminSidebar()"
-         class="sidebar-link <?= $tA?'active':'' ?>"
-         style="margin-bottom:0.125rem;background:<?=$tA?'rgba(59,130,246,0.15)':'transparent'?>;color:<?=$tA?'#60a5fa':'rgba(241,245,249,0.55)'?>;">
-        <span class="sidebar-icon"><?= icon($ti,15) ?></span>
-        <span style="font-size:0.8125rem;font-weight:600;"><?= $tlabel ?></span>
+      ] as [$tf, $ti, $tlabel]):
+        $tA = $__currentPath === $tf; ?>
+      <a href="<?= url('admin/' . $tf) ?>" onclick="closeAdminSidebar()"
+         class="sb-link<?= $tA ? ' active' : '' ?>">
+        <span class="sb-icon"><?= icon($ti, 15) ?></span>
+        <span class="sb-label"><?= e($tlabel) ?></span>
       </a>
       <?php endforeach; ?>
     </nav>
-    <div style="padding:0.625rem;border-top:1px solid var(--border);">
-      <div class="sidebar-user-avatar-section" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;margin-bottom:0.25rem;">
-        <span class="avatar avatar-sm"><?= strtoupper(substr($__user['display_name']??$__user['email'],0,1)) ?></span>
-        <div class="sidebar-user-info" style="min-width:0;flex:1;">
-          <div class="sidebar-user-name" style="font-size:var(--text-xs);font-weight:600;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= e($__user['display_name']??$__user['email']) ?></div>
-          <div class="sidebar-user-role" style="font-size:var(--text-2xs);color:var(--muted-foreground);"><?= e($__user['role'] === 'superadmin' ? 'Super Admin' : 'Administrator') ?></div>
+
+    <!-- Footer: user info + logout -->
+    <div class="sb-footer">
+      <div class="sb-user-row">
+        <span class="sb-avatar">
+          <?= strtoupper(substr($__user['display_name'] ?? $__user['email'], 0, 1)) ?>
+        </span>
+        <div class="sb-user-info">
+          <div class="sb-user-name">
+            <?= e($__user['display_name'] ?? $__user['email']) ?>
+          </div>
+          <div class="sb-user-role">
+            <?= e($__user['role'] === 'superadmin' ? 'Super Admin' : 'Administrator') ?>
+          </div>
         </div>
       </div>
-      <a href="<?= url('logout.php') ?>" class="sidebar-link admin-logout-link">
-        <span class="sidebar-icon"><?= icon('log-out',15) ?></span> <span class="fs-sm2 sidebar-logout-label">Sign out</span>
+      <a href="<?= url('logout.php') ?>" class="sb-logout">
+        <span class="sb-icon"><?= icon('log-out', 15) ?></span>
+        <span class="sb-label">Sign out</span>
       </a>
     </div>
 
-  </aside>
+  </aside><!-- /sidebar -->
 
-  <!-- Main -->
-  <div id="admin-main-wrapper" style="flex:1;display:flex;flex-direction:column;overflow:hidden;margin-left:3.5rem;">
-    <header style="background:var(--card);border-bottom:1px solid var(--border);padding:0 1.25rem;height:3.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:0.75rem;">
-        <!-- Mobile hamburger -->
-        <button id="admin-sidebar-open-btn" onclick="openAdminSidebar()" style="display:none;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--card);cursor:pointer;" title="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  <!-- ══════════════════════════════════════════════════════
+       MAIN WRAPPER
+       ══════════════════════════════════════════════════════ -->
+  <div id="admin-main-wrapper">
+
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="admin-topbar-left">
+        <button class="admin-hamburger" onclick="openAdminSidebar()" title="Menu"
+                id="admin-sidebar-open-btn" aria-label="Open navigation">
+          <?= icon('menu', 18) ?>
         </button>
-        <h1 style="font-family:var(--font-display);font-weight:700;font-size:0.9375rem;color:var(--foreground);"><?= e($pageTitle ?? 'Admin') ?></h1>
+        <h1 class="admin-page-title"><?= e($__pageHeader) ?></h1>
       </div>
-      <div style="display:flex;align-items:center;gap:0.625rem;">
+
+      <div class="admin-topbar-right">
         <?php
-          // Branch switcher (renders only if any branches exist)
           require_once __DIR__ . '/branch.php';
           $__bsw = renderBranchSwitcher();
           if ($__bsw) echo $__bsw;
         ?>
-        <form method="get" action="<?= url('admin/search.php') ?>" style="display:flex;align-items:center;">
-          <input name="q" placeholder="Search 40+ tables…" class="form-input admin-topbar-search" aria-label="Search admin">
+        <form method="get" action="<?= url('admin/search.php') ?>" style="display:flex;">
+          <input name="q" placeholder="Search…" class="admin-topbar-search" aria-label="Search admin">
         </form>
-        <a href="<?= url('index.php') ?>" target="_blank" class="btn btn-ghost btn-sm fs-xs">View site ↗</a>
-        <button onclick="toggleTheme()" style="display:grid;place-items:center;width:1.875rem;height:1.875rem;border-radius:9999px;border:1px solid var(--border);background:var(--card);color:var(--muted-foreground);cursor:pointer;" title="Toggle theme" aria-label="Toggle dark mode">
-          <svg id="admin-theme-icon-sun" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg id="admin-theme-icon-moon" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <a href="<?= url('index.php') ?>" target="_blank" class="btn btn-ghost btn-sm fs-xs">
+          View site ↗
+        </a>
+        <button onclick="toggleTheme()" class="admin-theme-btn" title="Toggle theme" aria-label="Toggle dark mode">
+          <!-- IDs must match head.php toggleTheme() / syncIcons() -->
+          <svg id="icon-sun" width="13" height="13" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2" aria-hidden="true" style="display:none;">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg id="icon-moon" width="13" height="13" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
         </button>
       </div>
     </header>
-    <main id="main-content" style="flex:1;overflow-y:auto;padding:1.5rem;">
-<?php 
-// DO NOT close </main> here - admin page content renders after this line
-// Each admin page must include admin-layout-close.php at the end to close everything
-// Each admin page must include admin-footer.php at the end to close everything
+
+    <!-- Page content injected here -->
+    <main id="main-content">
+<?php
+// Each admin page must include admin-layout-close.php at the end to close tags.

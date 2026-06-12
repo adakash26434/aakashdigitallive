@@ -84,8 +84,9 @@ endif; ?>
 
 <?php if (in_array($__ctx, ['admin', 'portal'], true)): ?>
   <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/daisyui.min.css">
-  <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/st-bs-datepicker.css">
+  <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/admin.css">
   <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/admin-forms.css">
+  <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/st-bs-datepicker.css">
   <script src="<?= $__siteUrl ?>/assets/js/st-bs-datepicker.js" defer></script>
 
   <style>
