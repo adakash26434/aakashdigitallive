@@ -29,7 +29,7 @@ $__siteName  = function_exists('stSiteName')
 if ($__siteName === '') $__siteName = 'Company';
 
 $__tagline = function_exists('cms') ? cms($__s, 'site_tagline', '') : trim((string)($__s['site_tagline'] ?? ''));
-$__addr    = function_exists('stAddress') ? stAddress() : trim((string)($__s['address'] ?? ($__s['company_address'] ?? '')));
+$__addr    = function_exists('stAddress') ? stAddress() : trim((string)($__s['address'] ?? ''));
 $__defaultDesc = $__tagline !== '' ? $__tagline : $__siteName;
 if ($__addr !== '') $__defaultDesc .= ' | ' . $__addr;
 

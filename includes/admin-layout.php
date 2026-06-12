@@ -103,8 +103,7 @@ require __DIR__ . '/head.php';
           ['licenses.php',       'key-round',       'License Keys'],
         ],
         'Settings' => [
-          ['settings.php',         'settings-2',    'Settings'],
-          ['company-settings.php', 'building-2',    'Company Settings'],
+          ['settings.php',         'settings',      'Site Settings'],
           ['users.php',            'user',          'Users'],
           ['staff.php',            'user-cog',      'Staff'],
           ['support-contacts.php', 'phone',         'Support Contacts'],

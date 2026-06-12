@@ -46,9 +46,6 @@ function siteSettings(): array {
         'logo_url'         => null,
         'favicon_url'      => null,
         'company_name'     => SITE_NAME,
-        'company_phone'    => '',
-        'company_email'    => '',
-        'company_address'  => '',
         'contact_email'    => '',
         'contact_phone'    => '',
         'address'          => '',
@@ -187,23 +184,17 @@ function stCompanyName(): string {
 
 function stContactEmail(): string {
     $s = siteSettings();
-    $v = trim((string)($s['contact_email'] ?? ''));
-    if ($v !== '') return $v;
-    return trim((string)($s['company_email'] ?? ''));
+    return trim((string)($s['contact_email'] ?? ''));
 }
 
 function stContactPhone(): string {
     $s = siteSettings();
-    $v = trim((string)($s['contact_phone'] ?? ''));
-    if ($v !== '') return $v;
-    return trim((string)($s['company_phone'] ?? ''));
+    return trim((string)($s['contact_phone'] ?? ''));
 }
 
 function stAddress(): string {
     $s = siteSettings();
-    $v = trim((string)($s['address'] ?? ''));
-    if ($v !== '') return $v;
-    return trim((string)($s['company_address'] ?? ''));
+    return trim((string)($s['address'] ?? ''));
 }
 
 // ── CSRF helpers ────────────────────────────────────────────────

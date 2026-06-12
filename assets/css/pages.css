@@ -1381,37 +1381,6 @@ html.dark .st-dropdown {
    UI/UX IMPROVEMENTS — v3.2
    ══════════════════════════════════════════════════════════════ */
 
-/* ── 1. Back-to-top button ─────────────────────────────────── */
-#st-back-top {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 500;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 4px 16px rgba(37,99,235,0.35);
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.25s, transform 0.25s, background 0.15s;
-  pointer-events: none;
-}
-#st-back-top.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-#st-back-top:hover { background: var(--primary-dark); }
-@media (max-width: 640px) {
-  #st-back-top { bottom: 1rem; right: 1rem; width: 2.25rem; height: 2.25rem; }
-}
-
 /* ── 2. Navbar: active underline indicator ─────────────────── */
 .nav-pill.active::after {
   content: '';
@@ -1472,11 +1441,11 @@ html.dark #st-navbar.is-scrolled {
 }
 
 /* ── 8. Toast notification position — avoid overlap with FAB ── */
-#st-toast-container {
+#toast-container {
   bottom: 4.5rem !important;
 }
 @media (min-width: 641px) {
-  #st-toast-container { bottom: 1.5rem !important; }
+  #toast-container { bottom: 1.5rem !important; }
 }
 
 /* ── 9. Image lazy-load fade-in ────────────────────────────── */
@@ -1563,3 +1532,36 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
 }
 
 /* ── 20. Sticky table header — handled in theme.css st-table th ── */
+
+/* ── 21. Scroll-to-top button ───────────────────────────────── */
+.st-scroll-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s, color 0.2s;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+}
+.st-scroll-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.st-scroll-top:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}

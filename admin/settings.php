@@ -16,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('site_tagline', trim($_POST['site_tagline'] ?? ''));
             saveSetting('logo_url',     trim($_POST['logo_url'] ?? ''));
             saveSetting('favicon_url',  trim($_POST['favicon_url'] ?? ''));
+        } elseif ($section === 'company') {
+            saveSetting('company_name',     trim($_POST['company_name'] ?? ''));
+            saveSetting('company_website',  trim($_POST['company_website'] ?? ''));
+            saveSetting('developed_by_name', trim($_POST['developed_by_name'] ?? ''));
+            saveSetting('developed_by_url',  trim($_POST['developed_by_url'] ?? ''));
         } elseif ($section === 'contact') {
             saveSetting('contact_email', trim($_POST['contact_email'] ?? ''));
             saveSetting('contact_phone', trim($_POST['contact_phone'] ?? ''));
@@ -269,6 +274,7 @@ $social = is_array($s['social_links'] ?? null) ? $s['social_links'] : [];
 
 $tabs = [
     ['general',       icon('settings',13),      'General'],
+    ['company',       icon('building-2',13),    'Company'],
     ['contact',       icon('mail',13),           'Contact'],
     ['social',        icon('share-2',13),        'Social'],
     ['whatsapp',      icon('message-circle',13), 'WhatsApp'],
@@ -347,6 +353,41 @@ $tabs = [
             <input type="url" name="favicon_url" class="form-input" value="<?= e(sv($s,'favicon_url')) ?>" placeholder="https://.../favicon.ico">
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save General Settings</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Company -->
+  <div x-show="tab==='company'" x-cloak>
+    <form method="POST">
+      <?= csrfField() ?><input type="hidden" name="section" value="company">
+      <div class="st-card p-card-lg">
+        <h3 class="h-eyebrow">Company Details</h3>
+        <p class="caption-meta" style="margin-top:-0.5rem;">Company name, website, and developer attribution displayed across the site.</p>
+        <div class="col-stack">
+          <div>
+            <label class="form-label">Company Name</label>
+            <input type="text" name="company_name" class="form-input" value="<?= e(sv($s,'company_name',stSiteName())) ?>" placeholder="Company name">
+            <span class="form-hint">Used in WhatsApp message, copyright, and meta tags.</span>
+          </div>
+          <div>
+            <label class="form-label">Company Website</label>
+            <input type="url" name="company_website" class="form-input" value="<?= e(sv($s,'company_website')) ?>" placeholder="https://example.com">
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:0.5rem 0;">
+          <h4 style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.5rem;">Developer Attribution</h4>
+          <div>
+            <label class="form-label">Developed By Name</label>
+            <input type="text" name="developed_by_name" class="form-input" value="<?= e(sv($s,'developed_by_name',stSiteName())) ?>" placeholder="Company name">
+            <span class="form-hint">Displayed in footer: "Developed by [Name]".</span>
+          </div>
+          <div>
+            <label class="form-label">Developer URL</label>
+            <input type="url" name="developed_by_url" class="form-input" value="<?= e(sv($s,'developed_by_url')) ?>" placeholder="https://example.com">
+            <span class="form-hint">Linked in footer attribution.</span>
+          </div>
+          <button type="submit" class="btn btn-primary w-fit">Save Company Settings</button>
         </div>
       </div>
     </form>

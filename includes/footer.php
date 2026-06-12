@@ -216,22 +216,11 @@
 <div id="toast-container" style="position:fixed;top:1.25rem;right:1.25rem;z-index:9999;display:flex;flex-direction:column;gap:0.625rem;pointer-events:none;"></div>
 
 <!-- ── Scroll-to-top ── -->
-<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})"
-  aria-label="Scroll to top" class="st-scroll-top" title="Back to top">
-  <i data-lucide="chevron-up" class="ic-16"></i>
+<button id="st-scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top" aria-label="Back to top" class="st-scroll-top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
 <script>
-// Scroll-to-top visibility
-(function(){
-  var btn = document.getElementById('scroll-top-btn');
-  if(!btn) return;
-  window.addEventListener('scroll', function(){
-    if(window.scrollY > 320){ btn.style.display='flex'; }
-    else { btn.style.display='none'; }
-  }, {passive:true});
-})();
-
 /* ── Toast ── */
 function showToast(msg, type='success') {
   const colors={success:'var(--success-fg)',error:'var(--danger-fg)',warning:'var(--warning-fg)',info:'var(--info-fg)'};
@@ -247,7 +236,6 @@ function showToast(msg, type='success') {
   document.getElementById('toast-container').appendChild(t);
   setTimeout(()=>{t.style.transition='all 0.3s';t.style.opacity='0';t.style.transform='translateX(1rem)';setTimeout(()=>t.remove(),300);},4000);
 }
-// नेपालीमा: confirmDelete() — yo function le aafno kaam garchha
 function confirmDelete(form,msg){if(confirm(msg||'Are you sure?'))form.submit();}
 
 /* ── Popup dismiss ── */
@@ -270,7 +258,6 @@ let stLastMsgId = 0;
 let stPollTimer = null;
 const CHAT_URL = '<?= url('api/chat.php') ?>';
 
-// नेपालीमा: stChatToggle() — yo function le aafno kaam garchha
 function stChatToggle() {
   const panel = document.getElementById('st-chat-panel');
   const iconO  = document.getElementById('st-chat-icon-open');
@@ -283,7 +270,6 @@ function stChatToggle() {
   if (!isOpen && stConvId) { stChatShowThread(); stStartPoll(); }
 }
 
-// नेपालीमा: stChatStart() — yo function le aafno kaam garchha
 function stChatStart() {
   const name  = document.getElementById('st-visitor-name').value.trim();
   const email = document.getElementById('st-visitor-email').value.trim();
@@ -303,13 +289,11 @@ function stChatStart() {
     }).catch(()=>showToast('Network error.','error'));
 }
 
-// नेपालीमा: stChatShowThread() — yo function le aafno kaam garchha
 function stChatShowThread() {
   document.getElementById('st-chat-start').style.display = 'none';
   document.getElementById('st-chat-thread').style.display = 'flex';
 }
 
-// नेपालीमा: stChatSend() — yo function le aafno kaam garchha
 function stChatSend() {
   const input = document.getElementById('st-msg-input');
   const msg   = input.value.trim();
@@ -321,7 +305,6 @@ function stChatSend() {
   fetch(CHAT_URL,{method:'POST',body:fd}).catch(()=>{});
 }
 
-// नेपालीमा: stAddMsg() — yo function le aafno kaam garchha
 function stAddMsg(sender, text, isNew=false) {
   const box  = document.getElementById('st-chat-messages');
   const isMe = sender === 'visitor';
@@ -332,14 +315,12 @@ function stAddMsg(sender, text, isNew=false) {
   box.scrollTop = box.scrollHeight;
 }
 
-// नेपालीमा: stStartPoll() — yo function le aafno kaam garchha
 function stStartPoll() {
   if (stPollTimer) clearInterval(stPollTimer);
   if (!stConvId) return;
   stPollTimer = setInterval(stPoll, 6000);
 }
 
-// नेपालीमा: stPoll() — yo function le aafno kaam garchha
 function stPoll() {
   if (!stConvId) return;
   fetch(CHAT_URL+'?action=poll&conv_id='+stConvId+'&since_id='+stLastMsgId)
@@ -376,29 +357,14 @@ function stSubscribe(e){
   .finally(()=>{ btn.disabled=false; btn.textContent='Subscribe'; });
 }
 
-/* Dark mode toggle is defined globally in includes/head.php */
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('<?= SITE_URL ?>/sw.js').catch(function(){});
-  });
-}
-</script>
-
-<!-- Back-to-top button -->
-<button id="st-back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top" aria-label="Back to top">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
-<script>
+/* ── Scroll-to-top visibility + lazy-load images ── */
 (function(){
-  var btn = document.getElementById('st-back-top');
-  if (!btn) return;
-  window.addEventListener('scroll', function() {
-    btn.classList.toggle('visible', window.scrollY > 320);
-  }, {passive: true});
-  // Lazy-load image fade-in
+  var btn = document.getElementById('st-scroll-top');
+  if (btn) {
+    window.addEventListener('scroll', function() {
+      btn.classList.toggle('visible', window.scrollY > 320);
+    }, {passive: true});
+  }
   if ('IntersectionObserver' in window) {
     var imgObs = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
@@ -414,10 +380,17 @@ if ('serviceWorker' in navigator) {
       imgObs.observe(img);
     });
   } else {
-    // Fallback: just show all
     document.querySelectorAll('img[loading="lazy"]').forEach(function(img){ img.style.opacity='1'; });
   }
 })();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('<?= SITE_URL ?>/sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
