@@ -728,10 +728,13 @@ CREATE TABLE IF NOT EXISTS gallery (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS partners (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
+id         INT AUTO_INCREMENT PRIMARY KEY,
   name       VARCHAR(255) NOT NULL,
   logo_url   VARCHAR(500),
   url        VARCHAR(500),
+  email      VARCHAR(255),
+  phone      VARCHAR(50),
+  address    TEXT,
   type       VARCHAR(30) NOT NULL DEFAULT 'client',
   district   VARCHAR(100),
   active     TINYINT NOT NULL DEFAULT 1,

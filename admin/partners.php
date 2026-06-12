@@ -21,17 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $district  = trim($_POST['district'] ?? '');
         $position  = (int)($_POST['position'] ?? 0);
         $active    = isset($_POST['active']) ? 1 : 0;
+        // Channel partner extra fields
+        $email     = trim($_POST['email'] ?? '');
+        $phone     = trim($_POST['phone'] ?? '');
+        $address   = trim($_POST['address'] ?? '');
 
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
                 if ($id) {
-                    execute("UPDATE partners SET name=?,logo_url=?,url=?,type=?,district=?,position=?,active=?,updated_at=NOW() WHERE id=?",
-                        [$name,$logo_url?:null,$url?:null,$type,$district?:null,$position,$active,$id]);
+                    execute("UPDATE partners SET name=?,logo_url=?,url=?,email=?,phone=?,address=?,type=?,district=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                        [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$id]);
                     $success = 'Partner updated.';
                 } else {
-                    execute("INSERT INTO partners (name,logo_url,url,type,district,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$name,$logo_url?:null,$url?:null,$type,$district?:null,$position,$active]);
+                    execute("INSERT INTO partners (name,logo_url,url,email,phone,address,type,district,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                        [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active]);
                     $success = 'Partner added.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $items = [];
-try { $items = query("SELECT id,name,logo_url,url,type,district,active,position FROM partners ORDER BY type,position,name"); }
+try { $items = query("SELECT id,name,logo_url,url,email,phone,address,type,district,active,position FROM partners ORDER BY type,position,name"); }
 catch(\Throwable $e) { 
     try { $items = query("SELECT id,name,logo_url,url,type FROM partners ORDER BY type,position,name"); }
     catch(\Throwable $e2) { $error = 'partners table not found. Run database.sql.'; }
@@ -99,6 +103,12 @@ sort($DISTRICTS);
         <div class="flex-1-min">
           <div style="font-weight:600;font-size:0.8125rem;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e($p['name'])?></div>
           <?php if(!empty($p['district'])):?><div class="fs-2xs-mt"><?=e($p['district'])?></div><?php endif;?>
+          <?php if($type==='channel' && (!empty($p['email'])||!empty($p['phone']))):?>
+          <div style="font-size:0.65rem;color:var(--primary);margin-top:0.2rem;">
+            <?php if(!empty($p['email'])):?>✉ <?=e($p['email'])?><?php endif;?>
+            <?php if(!empty($p['phone'])):?>  ☎ <?=e($p['phone'])?><?php endif;?>
+          </div>
+          <?php endif;?>
         </div>
         <div style="display:flex;gap:0.25rem;flex-shrink:0;">
           <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm"></a>
@@ -120,7 +130,7 @@ sort($DISTRICTS);
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
     <h3 class="h-eyebrow-tight"><?=$editing?' Edit':' Add Partner'?></h3>
-    <form method="POST" class="col-1-tight">
+    <form method="POST" class="col-1-tight" x-data="{type:'<?=e($editing['type']??'client')?>'}">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
@@ -131,7 +141,7 @@ sort($DISTRICTS);
       </div>
       <div>
         <label class="form-label fs-2xs2">Type</label>
-        <select name="type" class="form-input fs-sm2">
+        <select name="type" class="form-input fs-sm2" @change="type=$event.target.value">
           <option value="client"   <?=($editing['type']??'client')==='client'  ?'selected':''?>>Client</option>
           <option value="partner"  <?=($editing['type']??'')==='partner' ?'selected':''?>>Technology Partner</option>
           <option value="channel"  <?=($editing['type']??'')==='channel'  ?'selected':''?>>Channel Partner</option>
@@ -151,6 +161,28 @@ sort($DISTRICTS);
         <label class="form-label fs-2xs2">Website URL</label>
         <input type="url" name="url" class="form-input fs-sm2" value="<?=e($editing['url']??'')?>" placeholder="https://...">
       </div>
+
+      <!-- ═══ Channel Partner Contact Details ═══ -->
+      <div x-show="type==='channel'" x-cloak style="border:1px solid var(--primary-light);border-radius:0.75rem;padding:1rem;background:var(--primary-light);margin-top:0.5rem;">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.375rem;">
+          <i data-lucide="phone" style="width:14px;height:14px;"></i> Channel Partner Contact Details
+        </div>
+        <div style="display:grid;gap:0.75rem;">
+          <div>
+            <label class="form-label fs-2xs2">Email Address</label>
+            <input type="email" name="email" class="form-input fs-sm2" value="<?=e($editing['email']??'')?>" placeholder="partner@example.com">
+          </div>
+          <div>
+            <label class="form-label fs-2xs2">Phone Number</label>
+            <input type="tel" name="phone" class="form-input fs-sm2" value="<?=e($editing['phone']??'')?>" placeholder="98X-XXXXXXX">
+          </div>
+          <div>
+            <label class="form-label fs-2xs2">Address</label>
+            <textarea name="address" class="form-input fs-sm2" rows="2" placeholder="Full address…"><?=e($editing['address']??'')?></textarea>
+          </div>
+        </div>
+      </div>
+
       <div>
         <label class="form-label fs-2xs2">District</label>
         <select name="district" class="form-input fs-sm2">

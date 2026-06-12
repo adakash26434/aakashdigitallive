@@ -35,6 +35,16 @@ function runDbMigrations() {
         }
     } catch (\Throwable $e) { error_log('[db-migrations] ' . $e->getMessage()); }
 
+    try {
+        // Migration 4: Add email, phone, address columns to partners table (for channel partners)
+        $result = query("SHOW COLUMNS FROM partners LIKE 'email'");
+        if (empty($result)) {
+            execute("ALTER TABLE partners ADD COLUMN email VARCHAR(255) NULL AFTER url");
+            execute("ALTER TABLE partners ADD COLUMN phone VARCHAR(50) NULL AFTER email");
+            execute("ALTER TABLE partners ADD COLUMN address TEXT NULL AFTER phone");
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] ' . $e->getMessage()); }
+
 }
 
 // Auto-run on page load if needed (optional)
