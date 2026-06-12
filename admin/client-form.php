@@ -180,6 +180,14 @@ $_productServiceList = array_merge(
 $_productServiceList = array_unique($_productServiceList);
 sort($_productServiceList);
 
+// ── Pricing plans for Package dropdown ────────────────────────────────────────
+$_pricingPlans = [];
+try { $_pricingPlans = query("SELECT name FROM pricing_plans WHERE active=1 ORDER BY position, name"); } catch (\Throwable $e) { error_log('[client-form] pricing_plans: '.$e->getMessage()); }
+// Fallback if no plans configured yet
+if (empty($_pricingPlans)) {
+    $_pricingPlans = [['name'=>'Starter'],['name'=>'Growth'],['name'=>'Enterprise'],['name'=>'Custom']];
+}
+
 require_once '../includes/admin-layout.php';
 ?>
 
@@ -285,8 +293,8 @@ require_once '../includes/admin-layout.php';
           <label class="form-label">Package / Plan</label>
           <select name="package" class="form-input">
             <option value="">— Select package —</option>
-            <?php foreach(['Starter','Growth','Enterprise','Custom'] as $p): ?>
-            <option value="<?= $p ?>" <?= ($v('package')===$p)?'selected':'' ?>><?= $p ?></option>
+            <?php foreach($_pricingPlans as $_plan): ?>
+            <option value="<?= e($_plan['name']) ?>" <?= ($v('package')===$_plan['name'])?'selected':'' ?>><?= e($_plan['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>

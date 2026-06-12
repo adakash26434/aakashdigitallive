@@ -80,6 +80,11 @@ try { $clients = query("SELECT id, display_name, email, org_name FROM users WHER
 $products = [];
 try { $products = query("SELECT id, name FROM products WHERE active=1 ORDER BY name"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
+// Plan names for datalist suggestions in the subscription form
+$_planRows = [];
+try { $_planRows = query("SELECT name FROM pricing_plans WHERE active=1 ORDER BY position, name"); } catch (\Throwable $e) {}
+$GLOBALS['_sub_planNames'] = array_column($_planRows, 'name') ?: ['Starter', 'Growth', 'Enterprise', 'Custom'];
+
 $expiring = 0;
 $expired  = 0;
 foreach ($subs as $s) {

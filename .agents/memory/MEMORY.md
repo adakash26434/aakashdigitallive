@@ -1,2 +1,4 @@
-- [SQLite migration patterns](sqlite-migration.md) — SQLite has no AFTER in ALTER TABLE; idempotent migrations must suppress "duplicate column" not just log blindly.
-- [Admin sidebar CSS approach](admin-sidebar-css.md) — Uses max-width transition on .sb-label elements (not display:none toggling); sidebar overflow:hidden clips content naturally on collapse.
+- [SQLite migration rule](sqlite-migration-rule.md) — never add ALTER TABLE in sqliteMigrate() for columns already in CREATE TABLE; causes silent PDO errors every request
+- [Admin sidebar CSS](admin-sidebar-css.md) — sidebar uses max-width transition on .sb-label, not display:none; mobile uses translateX
+- [Client import/export columns](client-import-export.md) — export template must match exact column names the importer expects; see client-import.php header comment for canonical list
+- [Pricing plans as shared source](pricing-plans-shared-source.md) — pricing_plans table is the single source for plan names; client-form package dropdown and subscription plan_name datalist both pull from it

@@ -23,7 +23,13 @@ $prefix = isset($prefix) ? $prefix : (isset($id) ? 'edit' : 'add');
   </div>
   <div>
     <label class="form-label">Plan</label>
-    <input type="text" name="plan_name" class="form-input" placeholder="e.g. Growth, Enterprise">
+    <input type="text" name="plan_name" class="form-input" placeholder="e.g. Growth, Enterprise"
+           list="plan-name-suggestions" autocomplete="off">
+    <datalist id="plan-name-suggestions">
+      <?php foreach(($GLOBALS['_sub_planNames'] ?? []) as $_spn): ?>
+      <option value="<?= e($_spn) ?>">
+      <?php endforeach; ?>
+    </datalist>
   </div>
   <div>
     <label class="form-label">License Key</label>
