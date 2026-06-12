@@ -101,9 +101,20 @@ require_once '../includes/admin-layout.php';
     </p>
   </div>
   <div style="display:flex;gap:.625rem;flex-wrap:wrap;">
-    <a href="client-export-template.php" class="btn btn-outline btn-sm" title="Download sample CSV template">
+    <a href="client-export-template.php" class="btn btn-outline btn-sm" title="Download blank sample template">
+      <i data-lucide="file-down" class="ic-13"></i>
+      Template
+    </a>
+    <?php
+      $exportUrl = 'export-clients.php?'
+        . ($q     ? 'q='       . urlencode($q)     . '&' : '')
+        . ($filt  ? 'status='  . urlencode($filt)  . '&' : '')
+        . ($fprov ? 'province='. urlencode($fprov) . '&' : '');
+    ?>
+    <a href="<?= rtrim($exportUrl, '&?') ?>" class="btn btn-outline btn-sm"
+       title="Export current view as import-ready CSV (26 columns, same format as template)">
       <i data-lucide="download" class="ic-13"></i>
-      Download Template
+      Export CSV
     </a>
     <a href="client-import.php" class="btn btn-outline btn-sm">
       <i data-lucide="upload" class="ic-13"></i>
