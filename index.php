@@ -147,90 +147,143 @@ include 'includes/header.php';
 ?>
 
 <!-- ══════════════════════════════════════════════
-  § 1 — HERO SLIDER (full-width background image carousel)
+  § 1 — MESH GRADIENT + SPLIT HERO
+  Modern, premium hero with animated mesh gradient background,
+  split layout (left text + right dashboard mockup).
+  Fully editable from Admin → Settings → Homepage → Hero Section.
 ══════════════════════════════════════════════ -->
-<style>
-.hero-ca .hero-h1  { animation: heroUp  .65s cubic-bezier(.22,.61,.36,1) both; }
-.hero-ca .hero-bar { animation: heroBar .45s ease .15s both; }
-.hero-ca .hero-sub { animation: heroUp  .65s cubic-bezier(.22,.61,.36,1) .28s both; }
-.hero-ca .hero-cta { animation: heroUp  .65s cubic-bezier(.22,.61,.36,1) .42s both; }
-@keyframes heroUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-@keyframes heroBar { from { width:0; opacity:0; } to { width:3rem; opacity:1; } }
-</style>
-<div id="hero-slider"
-  x-data="{
-    cur: 0,
-    total: <?= count($_heroSlides) ?>,
-    timer: null,
-    init() { if (this.total > 1) this.timer = setInterval(() => this.next(), 5500); },
-    next() { this.cur = (this.cur + 1) % this.total; },
-    prev() { this.cur = (this.cur - 1 + this.total) % this.total; },
-    go(i)  { this.cur = i; clearInterval(this.timer); if (this.total > 1) this.timer = setInterval(() => this.next(), 5500); }
-  }"
-  x-init="init()"
-  style="position:relative;overflow:hidden;height:clamp(420px,58vh,580px);background:#0a1023;">
+<?php
+// Hero mesh colors — editable from admin
+$_heroMesh1 = trim($__s['hero_mesh_1'] ?? '') ?: '#2563eb';
+$_heroMesh2 = trim($__s['hero_mesh_2'] ?? '') ?: '#7c3aed';
+$_heroMesh3 = trim($__s['hero_mesh_3'] ?? '') ?: '#06b6d4';
+$_heroBg    = trim($__s['hero_bg'] ?? '') ?: '#0a1023';
 
-  <!-- ── Slides ── -->
-  <?php foreach($_heroSlides as $_hk => $_hs):
-    $_hasImage = !empty($_hs['img']);
-    $_bgStyle = $_hasImage
-      ? "background-image:url('" . e($_hs['img']) . "');background-size:cover;background-position:center;filter:brightness(1.05);"
-      : "background:linear-gradient(135deg,#0a1023 0%,#0f2057 50%,#1a0a3d 100%);";
-    $_overlay = $_hasImage
-      ? 'background:linear-gradient(100deg,rgba(8,14,30,.85) 0%,rgba(8,14,30,.70) 42%,rgba(8,14,30,.45) 100%);'
-      : "background:linear-gradient(100deg,rgba(8,14,30,.75) 0%,rgba(8,14,30,.60) 42%,rgba(8,14,30,.35) 100%);";
-    $_slideLink = !empty($_hs['link']) ? $_hs['link'] : $_ctaHref;
-    $_slideBtn  = !empty($_hs['btn'])  ? $_hs['btn']  : $_ctaLabel;
-  ?>
-  <div
-    :style="(cur === <?= $_hk ?> ? 'opacity:1;z-index:1; ' : 'opacity:0;z-index:0; ') + 'position:absolute;inset:0;<?= addslashes($_bgStyle) ?>transition:opacity .75s ease;will-change:opacity;'">
-    <div style="position:absolute;inset:0;<?= $_overlay ?>"></div>
-    <div class="container" style="position:relative;height:100%;display:flex;align-items:center;padding-top:2rem;">
-      <div :class="cur==<?=$_hk?>?'hero-ca':''" style="max-width:36rem;">
-        <h1 class="hero-h1" style="font-family:var(--font-display);font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#fff;line-height:1.1;margin:0 0 .875rem;letter-spacing:-.025em;text-shadow:0 4px 20px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.5);">
-          <?= nl2br(e($_hs['title'])) ?>
-        </h1>
-        <div class="hero-bar" style="width:3rem;height:3px;background:var(--primary);border-radius:2px;margin-bottom:1rem;"></div>
-        <?php if(!empty($_hs['sub'])): ?>
-        <p class="hero-sub" style="font-size:clamp(0.9375rem,1.8vw,1rem);color:#fff;line-height:1.72;margin:0 0 1.75rem;max-width:28rem;text-shadow:0 3px 12px rgba(0,0,0,.5), 0 1px 4px rgba(0,0,0,.4);font-weight:500;">
-          <?= e($_hs['sub']) ?>
-        </p>
-        <?php endif; ?>
-        <a href="<?= e($_slideLink) ?>" class="btn btn-primary hero-cta" style="font-size:var(--text-sm);padding:.6875rem 1.5rem;gap:.5rem;">
-          <?= e($_slideBtn) ?> <i data-lucide="arrow-right" class="ic-14"></i>
-        </a>
+// Badge text
+$_badge1 = cms($__s, 'hero_badge1_text') ?: (isNepali() ? '🇳🇵 नेपालमा बनेको' : '🇳🇵 Built for Nepal');
+$_badge2 = cms($__s, 'hero_badge2_text') ?: (isNepali() ? '१२०+ सहकारीहरूको विश्वास' : 'Trusted by 120+ Cooperatives');
+
+// CTA
+$_ctaHref  = trim($__s['homepage_cta_url'] ?? '') ?: url('contact.php');
+$_ctaLabel = cms($__s,'homepage_cta_text') ?: __('home_hero_book_demo');
+$_ctaSec   = cms($__s,'hero_cta_secondary') ?: (isNepali() ? 'डेमो हेर्नुस' : 'Watch Demo');
+
+// Dashboard mockup numbers — editable from admin
+$_mockMembers  = trim($__s['hero_mock_members'] ?? '') ?: '2,847';
+$_mockDeposits = trim($__s['hero_mock_deposits'] ?? '') ?: 'NPR 8.4 Cr';
+$_mockLoans    = trim($__s['hero_mock_loans'] ?? '') ?: '142';
+$_mockGrowth   = trim($__s['hero_mock_growth'] ?? '') ?: '+14.2%';
+
+// Hero title & subtitle
+$_heroTitleVal = cms($__s, 'homepage_hero_title') ?: (isNepali() ? 'डिजिटाइजेसन र <span class="tg">अटोमेसन</span>' : 'IT Solutions & <span class="tg">Automation</span>');
+$_heroSubVal   = cms($__s, 'homepage_hero_subtitle') ?: (isNepali() ? 'सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।' : 'End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.');
+?>
+<section class="st-hero" style="--hero-bg:<?= e($_heroBg) ?>;--hero-mesh-1:<?= e($_heroMesh1) ?>;--hero-mesh-2:<?= e($_heroMesh2) ?>;--hero-mesh-3:<?= e($_heroMesh3) ?>;">
+
+  <!-- Animated mesh gradient blobs -->
+  <div class="st-hero-mesh">
+    <span class="m1"></span>
+    <span class="m2"></span>
+    <span class="m3"></span>
+  </div>
+
+  <!-- Grid pattern overlay -->
+  <div class="st-hero-grid"></div>
+
+  <div class="container">
+    <div class="st-hero-split">
+
+      <!-- ── LEFT: Text content ── -->
+      <div class="hero-left">
+        <!-- Badge row -->
+        <div class="hero-badge">
+          <i data-lucide="sparkles"></i>
+          <?= e($_badge2) ?>
+        </div>
+
+        <!-- Title -->
+        <h1 class="hero-title"><?= $_heroTitleVal ?></h1>
+
+        <!-- Accent bar -->
+        <div class="hero-bar"></div>
+
+        <!-- Subtitle -->
+        <p class="hero-sub"><?= e($_heroSubVal) ?></p>
+
+        <!-- CTA buttons -->
+        <div class="hero-actions">
+          <a href="<?= e($_ctaHref) ?>" class="btn btn-primary">
+            <?= e($_ctaLabel) ?> <i data-lucide="arrow-right" class="ic-14"></i>
+          </a>
+          <a href="<?= url('services.php') ?>" class="btn btn-outline-light">
+            <i data-lucide="play-circle" class="ic-14"></i>
+            <?= e($_ctaSec) ?>
+          </a>
+        </div>
+
+        <!-- Trust pills -->
+        <div class="hero-trust">
+          <span><i data-lucide="check-circle"></i><?= isNepali() ? 'कुनै कन्ट्र्याक्ट छैन' : 'No long-term contract' ?></span>
+          <span><i data-lucide="phone"></i><?= isNepali() ? 'स्थानीय सहयोग' : 'Local support' ?></span>
+          <span><i data-lucide="lock"></i><?= isNepali() ? 'नेपालमा डाटा' : 'Data in Nepal' ?></span>
+        </div>
       </div>
+
+      <!-- ── RIGHT: Dashboard mockup ── -->
+      <div class="hero-right">
+        <div class="hero-mockup">
+          <!-- Chrome bar -->
+          <div class="mockup-bar">
+            <span class="dot dot-r"></span>
+            <span class="dot dot-y"></span>
+            <span class="dot dot-g"></span>
+            <span class="mockup-title">Dashboard — <?= e(stCompanyName()) ?></span>
+          </div>
+          <!-- Body -->
+          <div class="mockup-body">
+            <div class="mockup-row">
+              <span class="label">Total Members</span>
+              <span class="value blue"><?= e($_mockMembers) ?></span>
+            </div>
+            <div class="mockup-row">
+              <span class="label">Total Deposits</span>
+              <span class="value green"><?= e($_mockDeposits) ?></span>
+            </div>
+            <div class="mockup-row">
+              <span class="label">Active Loans</span>
+              <span class="value amber"><?= e($_mockLoans) ?></span>
+            </div>
+            <!-- Mini bar chart -->
+            <div class="mockup-chart">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating stat chips -->
+        <div class="float-chip f1 green">
+          <i data-lucide="trending-up" style="width:12px;height:12px;"></i>
+          <?= e($_mockGrowth) ?> growth
+        </div>
+        <div class="float-chip f2 blue">
+          <i data-lucide="users" style="width:12px;height:12px;"></i>
+          <?= e($_mockMembers) ?> members
+        </div>
+        <div class="float-chip f3 amber">
+          <i data-lucide="clock" style="width:12px;height:12px;"></i>
+          <?= isNepali() ? '२४/७ सहयोग' : '24/7 Support' ?>
+        </div>
+      </div>
+
     </div>
   </div>
-  <?php endforeach; unset($_hk, $_hs, $_bgStyle, $_slideLink, $_slideBtn); ?>
-
-  <?php if(count($_heroSlides) > 1): ?>
-  <!-- Prev arrow -->
-  <button @click="prev(); clearInterval(timer); timer=setInterval(()=>next(),5500)"
-    aria-label="<?= isNepali()?'अघिल्लो':'Previous slide' ?>"
-    style="position:absolute;left:1.25rem;top:50%;transform:translateY(-50%);z-index:20;width:2.75rem;height:2.75rem;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.28);color:#fff;cursor:pointer;display:grid;place-items:center;transition:background .2s;padding:0;"
-    onmouseover="this.style.background='rgba(255,255,255,.32)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">
-    <i data-lucide="chevron-left" style="width:20px;height:20px;pointer-events:none;"></i>
-  </button>
-  <!-- Next arrow -->
-  <button @click="next(); clearInterval(timer); timer=setInterval(()=>next(),5500)"
-    aria-label="<?= isNepali()?'अर्को':'Next slide' ?>"
-    style="position:absolute;right:1.25rem;top:50%;transform:translateY(-50%);z-index:20;width:2.75rem;height:2.75rem;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.28);color:#fff;cursor:pointer;display:grid;place-items:center;transition:background .2s;padding:0;"
-    onmouseover="this.style.background='rgba(255,255,255,.32)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">
-    <i data-lucide="chevron-right" style="width:20px;height:20px;pointer-events:none;"></i>
-  </button>
-  <!-- Dot indicators -->
-  <div style="position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.5rem;z-index:20;">
-    <?php foreach($_heroSlides as $_hk => $_): ?>
-    <button @click="go(<?= $_hk ?>)"
-      :style="cur==<?= $_hk ?> ? 'width:1.75rem;background:#fff;opacity:1;' : 'width:.5rem;background:rgba(255,255,255,.5);'"
-      aria-label="Slide <?= $_hk+1 ?>"
-      style="height:.5rem;border-radius:9999px;border:none;cursor:pointer;transition:all .35s ease;padding:0;"></button>
-    <?php endforeach; unset($_hk,$_); ?>
-  </div>
-  <?php endif; ?>
-
-</div>
+</section>
 
 <!-- ══════════════════════════════════════════════
   § 2 — STATS BAR

@@ -52,6 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('google_analytics_id',trim($_POST['google_analytics_id'] ?? ''));
             saveSetting('robots_txt_extra',   trim($_POST['robots_txt_extra'] ?? ''));
         } elseif ($section === 'homepage') {
+            // Hero mesh gradient colors
+            saveSetting('hero_mesh_1', trim($_POST['hero_mesh_1'] ?? ''));
+            saveSetting('hero_mesh_2', trim($_POST['hero_mesh_2'] ?? ''));
+            saveSetting('hero_mesh_3', trim($_POST['hero_mesh_3'] ?? ''));
+            saveSetting('hero_bg',     trim($_POST['hero_bg'] ?? ''));
             saveSetting('homepage_hero_title',    trim($_POST['homepage_hero_title'] ?? ''));
             saveSetting('homepage_hero_subtitle', trim($_POST['homepage_hero_subtitle'] ?? ''));
             saveSetting('homepage_cta_text',      trim($_POST['homepage_cta_text'] ?? ''));
@@ -494,42 +499,73 @@ $tabs = [
         </div>
         <p style="font-size:0.8125rem;color:var(--muted-foreground);margin-bottom:1.25rem;">Each section is collapsible. Leave any field blank to use the built-in default.</p>
 
-        <!-- ① Hero -->
+        <!-- ① Hero — Mesh Gradient + Split Layout -->
         <details class="st-accordion" open>
-          <summary><?= icon('star',14,'color:var(--primary);flex-shrink:0;') ?> Hero Section</summary>
+          <summary><?= icon('star',14,'color:var(--primary);flex-shrink:0;') ?> Hero Section — Mesh Gradient + Split Layout</summary>
           <div class="st-accordion__body">
-            <!-- Slide images -->
-            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Slider — Images &amp; Per-Slide Text</div>
-            <p class="caption-meta" style="margin-top:0;margin-bottom:.875rem;">Upload images from <a href="media.php" class="text-primary">Media Manager</a> and paste the URL below. Slide 1 always shows. Slides 2 &amp; 3 appear only when their image URL is set.</p>
-            <?php for ($__hsi = 1; $__hsi <= 3; $__hsi++): ?>
-            <div style="background:var(--muted);border-radius:.5rem;padding:.875rem;display:flex;flex-direction:column;gap:.625rem;margin-bottom:.5rem;">
-              <div style="font-size:.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Slide <?= $__hsi ?> <?= $__hsi===1?'(required)':'(optional)' ?></div>
+
+            <!-- Mesh gradient colors -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Mesh Gradient Colors</div>
+            <p class="caption-meta" style="margin-top:0;margin-bottom:.875rem;">The hero uses an animated mesh gradient background with 3 color blobs. Pick colors that match your brand.</p>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1rem;">
               <div>
-                <?php
-                  $imgField = "hero_image_{$__hsi}";
-                  $imgValue = sv($s, "hero_image_{$__hsi}");
-                  $imgLabel = 'Background Image URL';
-                  require __DIR__ . '/../includes/admin-img-upload.php';
-                ?>
+                <label class="form-label fs-xs">Mesh Blob 1 (top-left)</label>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <input type="color" name="hero_mesh_1" value="<?= e(sv($s,'hero_mesh_1','#2563eb')) ?>" style="width:2.5rem;height:2.25rem;border-radius:0.5rem;border:2px solid var(--border);cursor:pointer;padding:0.1rem;">
+                  <input type="text" name="hero_mesh_1" class="form-input" style="max-width:7rem;font-family:monospace;font-size:0.8125rem;" value="<?= e(sv($s,'hero_mesh_1','#2563eb')) ?>" placeholder="#2563eb" maxlength="7">
+                </div>
               </div>
-              <?php biI($s,"hero_slide_{$__hsi}_title","Slide Title (blank = use main Hero Title below)",'','') ?>
-              <?php biTA($s,"hero_slide_{$__hsi}_subtitle","Slide Subtitle",'','',2) ?>
+              <div>
+                <label class="form-label fs-xs">Mesh Blob 2 (bottom-right)</label>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <input type="color" name="hero_mesh_2" value="<?= e(sv($s,'hero_mesh_2','#7c3aed')) ?>" style="width:2.5rem;height:2.25rem;border-radius:0.5rem;border:2px solid var(--border);cursor:pointer;padding:0.1rem;">
+                  <input type="text" name="hero_mesh_2" class="form-input" style="max-width:7rem;font-family:monospace;font-size:0.8125rem;" value="<?= e(sv($s,'hero_mesh_2','#7c3aed')) ?>" placeholder="#7c3aed" maxlength="7">
+                </div>
+              </div>
+              <div>
+                <label class="form-label fs-xs">Mesh Blob 3 (center-right)</label>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <input type="color" name="hero_mesh_3" value="<?= e(sv($s,'hero_mesh_3','#06b6d4')) ?>" style="width:2.5rem;height:2.25rem;border-radius:0.5rem;border:2px solid var(--border);cursor:pointer;padding:0.1rem;">
+                  <input type="text" name="hero_mesh_3" class="form-input" style="max-width:7rem;font-family:monospace;font-size:0.8125rem;" value="<?= e(sv($s,'hero_mesh_3','#06b6d4')) ?>" placeholder="#06b6d4" maxlength="7">
+                </div>
+              </div>
             </div>
-            <?php endfor; unset($__hsi); ?>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+              <div>
+                <label class="form-label fs-xs">Hero Background Color</label>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <input type="color" name="hero_bg" value="<?= e(sv($s,'hero_bg','#0a1023')) ?>" style="width:2.5rem;height:2.25rem;border-radius:0.5rem;border:2px solid var(--border);cursor:pointer;padding:0.1rem;">
+                  <input type="text" name="hero_bg" class="form-input" style="max-width:7rem;font-family:monospace;font-size:0.8125rem;" value="<?= e(sv($s,'hero_bg','#0a1023')) ?>" placeholder="#0a1023" maxlength="7">
+                </div>
+              </div>
+            </div>
             <hr style="border:none;border-top:1px solid var(--border);">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;">Default Title &amp; Subtitle (fallback for all slides)</div>
-            <?php biI($s,'homepage_hero_title','Hero Title','IT Solutions & Software Services','IT समाधान र सफ्टवेयर सेवाहरू') ?>
-            <?php biTA($s,'homepage_hero_subtitle','Hero Subtitle','End-to-end software solutions...','IT समाधान, सफ्टवेयर सेवाहरू...',3) ?>
+
+            <!-- Hero text content -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Text Content</div>
+            <?php biI($s,'homepage_hero_title','Hero Title','IT Solutions & <span class="tg">Automation</span>','डिजिटाइजेसन र <span class="tg">अटोमेसन</span>') ?>
+            <?php biTA($s,'homepage_hero_subtitle','Hero Subtitle','End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.','सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।',3) ?>
             <hr style="border:none;border-top:1px solid var(--border);">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;">CTA Button</div>
+
+            <!-- Badges -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Badges</div>
+            <?php biI($s,'hero_badge1_text','Badge 1 (small top badge)','🇳🇵 Built for Nepal','🇳🇵 नेपालमा बनेको') ?>
+            <?php biI($s,'hero_badge2_text','Badge 2 (main badge)','Trusted by 120+ Cooperatives','१२०+ सहकारीहरूको विश्वास') ?>
+            <hr style="border:none;border-top:1px solid var(--border);">
+
+            <!-- CTA Buttons -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">CTA Buttons</div>
             <?php biI($s,'homepage_cta_text','Primary CTA Button Text','Request a Demo','डेमो अनुरोध गर्नुस') ?>
             <div>
               <label class="form-label">Primary CTA Button URL</label>
               <input type="url" name="homepage_cta_url" class="form-input" value="<?= e(sv($s,'homepage_cta_url')) ?>" placeholder="/contact.php">
             </div>
+            <?php biI($s,'hero_cta_secondary','Secondary CTA Button Text','Watch Demo','डेमो हेर्नुस') ?>
             <hr style="border:none;border-top:1px solid var(--border);">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;">Hero Stats (4 boxes below headline)</div>
-            <p class="caption-meta" style="margin-top:0;">Leave blank to use defaults (120+ Clients, 8 yrs, &lt;2 hr, 99.9%)</p>
+
+            <!-- Hero Stats -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Stats (4 boxes below headline)</div>
+            <p class="caption-meta" style="margin-top:0;">Leave blank to use defaults (120+ Clients, 8 yrs, <2 hr, 99.9%)</p>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <?php
               $defaultStats = [
